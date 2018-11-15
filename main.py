@@ -31,7 +31,7 @@ def createReqData(date,startLocation,destinationLocation):
     
     tdate = conv_TDate(date)
     
-    data = '{"origin":"'+originName+'","originCode":"'+originCode+'","originLocation":{"id":null,"label":null,"longitude":null,"latitude":null,"type":"G","country":null,"stationCode":"'+originCode+'","stationLabel":null},"destination":"'+destinationName+'","destinationCode":"'+destinationCode+'","destinationLocation":{"id":null,"label":null,"longitude":null,"latitude":null,"type":"G","country":null,"stationCode":"'+destinationCode+'","stationLabel":null},"via":null,"viaCode":null,"viaLocation":null,"directTravel":false,"asymmetrical":false,"professional":false,"customerAccount":false,"oneWayTravel":true,"departureDate":"'+tdate+'","returnDate":null,"travelClass":"SECOND","country":"FR","language":"fr","busBestPriceOperator":null,"passengers":[{"travelerId":null,"profile":"ADULT","age":21,"birthDate":null,"fidelityCardType":"NONE","fidelityCardNumber":null,"commercialCardNumber":"","commercialCardType":"YOUNGS","promoCode":null,"lastName":null,"firstName":null,"phoneNumer":null,"hanInformation":null}],"animals":[],"bike":"NONE","withRecliningSeat":false,"physicalSpace":null,"fares":[],"withBestPrices":false,"highlightedTravel":null,"nextOrPrevious":false,"source":"FORM_SUBMIT","targetPrice":null,"han":false,"outwardScheduleType":"BY_DEPARTURE_DATE","inwardScheduleType":"BY_DEPARTURE_DATE","currency":null,"codeFce":null,"companions":[],"asymetricalItinerary":{}}'
+    data = '{"origin":"'+originName+'","originCode":"'+originCode+'","originLocation":{"id":null,"label":null,"longitude":null,"latitude":null,"type":"G","country":null,"stationCode":"'+originCode+'","stationLabel":null},"destination":"'+destinationName+'","destinationCode":"'+destinationCode+'","destinationLocation":{"id":null,"label":null,"longitude":null,"latitude":null,"type":"G","country":null,"stationCode":"'+destinationCode+'","stationLabel":null},"via":null,"viaCode":null,"viaLocation":null,"directTravel":false,"asymmetrical":false,"professional":false,"customerAccount":false,"oneWayTravel":true,"departureDate":"'+tdate+'","returnDate":null,"travelClass":"SECOND","country":"FR","language":"fr","busBestPriceOperator":null,"passengers":[{"travelerId":null,"profile":"YOUNG","age":null,"birthDate":null,"fidelityCardType":"NONE","fidelityCardNumber":null,"commercialCardNumber":"","commercialCardType":"YOUNGS","promoCode":null,"lastName":null,"firstName":null,"phoneNumer":null,"hanInformation":null}],"animals":[],"bike":"NONE","withRecliningSeat":false,"physicalSpace":null,"fares":[],"withBestPrices":false,"highlightedTravel":null,"nextOrPrevious":false,"source":"FORM_SUBMIT","targetPrice":null,"han":false,"outwardScheduleType":"BY_DEPARTURE_DATE","inwardScheduleType":"BY_DEPARTURE_DATE","currency":null,"codeFce":null,"companions":[],"asymetricalItinerary":{}}'
     
     return data
     
@@ -59,7 +59,7 @@ def getTrainData(train):
     trainData["arrivalDate"]=conv_Date(train['arrivalDate'])
     #train duration
     trainData["minuteDuration"]=train['minuteDuration']
-    #trai prices
+    #train prices
     trainData["prices"]=[]
     for offer in train["priceProposals"] :
         price = offer["amount"]
