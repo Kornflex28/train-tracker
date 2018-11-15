@@ -79,6 +79,7 @@ def train_String(trainData):
     
     
 def getTrainsData(date,startLocation,endLocation):
+    print("Getting response...")
     response = query(date,startLocation,endLocation)
     trains = response.json()["trainProposals"]
     trainsData = []
@@ -95,5 +96,4 @@ def trains_String(date,startLocation,endLocation):
         string+= train_String(train)+"\n"
     print(string)
     
-
-    
+trains_String(dt.datetime.today(),"Paris","Brest")
