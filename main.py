@@ -78,7 +78,8 @@ def train_String(trainData):
     return string
     
     
-def getTrainsData(response):
+def getTrainsData(date,startLocation,endLocation):
+    response = query(date,startLocation,endLocation)
     trains = response.json()["trainProposals"]
     trainsData = []
     for train in trains :
@@ -86,13 +87,13 @@ def getTrainsData(response):
     return trainsData
 
 #return a toString of trains data
-def trains_String(response):
-    data = getTrainsData(response)
+def trains_String(date,startLocation,endLocation):
+    data = getTrainsData(date,startLocation,endLocation)
     string=""
     for k in range(len(data)):
         train = data[k]
         string+= train_String(train)+"\n"
     print(string)
-        
+    
 
     
