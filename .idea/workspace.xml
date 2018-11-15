@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ae016edf-2fd9-4133-8306-ef8456ff9903" name="Default" comment="" />
+    <list default="true" id="ae016edf-2fd9-4133-8306-ef8456ff9903" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -32,11 +34,20 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="station.json" pinned="false" current-in-tab="true">
+      <file leaf-file-name="station.json" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/station.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="425">
-              <caret line="987" column="48" selection-start-line="987" selection-start-column="43" selection-end-line="987" selection-end-column="48" />
+            <state relative-caret-position="399">
+              <caret line="272" column="2" selection-start-line="272" selection-start-column="2" selection-end-line="272" selection-end-column="40" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret column="6" selection-start-column="6" selection-end-column="6" />
             </state>
           </provider>
         </entry>
@@ -63,6 +74,7 @@
       <find>&quot;FR</find>
       <find>Toulouse</find>
       <find>Paris</find>
+      <find>Dunker</find>
     </findStrings>
     <replaceStrings>
       <replace>&quot;</replace>
@@ -79,12 +91,13 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/main.py" />
-        <option value="$PROJECT_DIR$/station.json" />
         <option value="$PROJECT_DIR$/stationClear.py" />
         <option value="$PROJECT_DIR$/real_station.json" />
         <option value="$PROJECT_DIR$/scrapGare.py" />
         <option value="$PROJECT_DIR$/gares.json" />
         <option value="$PROJECT_DIR$/station_scraping/stationClear.py" />
+        <option value="$PROJECT_DIR$/station.json" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -239,8 +252,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/station.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="987" column="48" selection-start-line="987" selection-start-column="43" selection-end-line="987" selection-end-column="48" />
+        <state relative-caret-position="399">
+          <caret line="272" column="2" selection-start-line="272" selection-start-column="2" selection-end-line="272" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="6" selection-start-column="6" selection-end-column="6" />
         </state>
       </provider>
     </entry>
