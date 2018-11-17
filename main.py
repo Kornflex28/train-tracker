@@ -5,6 +5,7 @@ from travel import Travel
 from date import Date
 
 
+
 def get_train_data(train):
     train_data={}
     # train numbers
@@ -38,6 +39,7 @@ def train_to_string(train_data):
         string+= str(price[1]) + " restants à "+str(price[0])+"e\n"
     # print(string)
     return string
+
 
 
 def get_trains_data(date,origin_name,destination_name):
