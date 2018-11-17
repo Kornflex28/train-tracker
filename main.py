@@ -34,7 +34,7 @@ def get_train_data(train):
 # return a toString of train data
 def train_to_string(train_data):
     duration = str(train_data["minuteDuration"]//60) +"h"+str(train_data["minuteDuration"]%60)
-    string = "Train ("+",".join(train_data["type"])+") numero "+",".join(train_data["numbers"])+":\n"+"Depart de "+train_data["origin_code"]+" : "+train_data["departureDate"]+"\n"+"Arrivee a "+train_data["destination_code"]+" : " + train_data["arrivalDate"]+"\n"+"Duree : "+duration+"\n"+"Prix :\n"
+    string = "Train ("+",".join(train_data["type"])+") numero "+",".join(train_data["numbers"])+":\n"+"Depart de "+Station.get_name_by_code(train_data["origin_code"])+" : "+train_data["departureDate"]+"\n"+"Arrivee a "+Station.get_name_by_code(train_data["destination_code"])+" : " + train_data["arrivalDate"]+"\n"+"Duree : "+duration+"\n"+"Prix :\n"
     for price in train_data["prices"]:
         string+= str(price[1]) + " restants à "+str(price[0])+"e\n"
     # print(string)
@@ -60,10 +60,10 @@ def trains_to_string(date,origin_name,destination_name):
     for k in range(len(data)):
         train = data[k]
         string+= train_to_string(train)+"\n"
-    print(string)
+    print(string.encode("utf-8"))
 
 
-trains_to_string(dt.datetime.today(),"Paris (toutes gares intramuros)","Rennes (Bretagne)")
+trains_to_string(dt.datetime(2018, 12, 5, 7, 0, 0), "Paris (toutes gares intramuros)", "Rennes (Bretagne)")
 
 
 
