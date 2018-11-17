@@ -17,7 +17,8 @@ class Travel:
         response_json = Travel._query(date, origin, destination).json()
         if "trainProposals" in response_json:
             trains = response_json["trainProposals"]
-            print(trains)
+            # print(trains)
+            return trains
         else:
             raise ValueError('Bad response from request')
 

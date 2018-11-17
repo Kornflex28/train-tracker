@@ -1,160 +1,67 @@
 ###
-import requests
 import datetime as dt
-
-sncfURL = 'https://www.oui.sncf/proposition/rest/search-travels/outward'
-
-#need to find database
-towns = {"Paris" : {"code":"FRPAR","name":"Paris (Toutes gares intramuros)"},"Brest":{"code":"FRBES","name":"Brest"},"Lyon":{"code":"FRLYS","name":"Lyon (Toutes gares intramuros)"},"Marseille":{"code":"FRMRS","name":"Marseille (Toutes gares)"},"Naucelle":{"code":"FRFWF","name":"Naucelle"},"Toulouse":{"code":"FRTLS","name":"Toulouse (Toutes gares)"},"Rennes":{"code":"FRRNS","name":"Rennes"},"Montpellier":{"code":"FRMPT","name":"Montpellier (toutes gares)"}}
+from station import Station
+from travel import Travel
+from date import Date
 
 
-### Useful Fonctions
-
-#return string format for the Request
-#date = datetime
-def conv_TDate(date):
-    return str(date)[:10]+"T"+str(date)[11:19]
-
-#return date in string
-def conv_Date(tdate):
-    print(tdate)
-    return tdate[:10]+" "+tdate[11:19]
-
-#Return the data for the request
-#startLocation : string
-#endLocation : string
-#date = datetime
-def createReqData(date,startLocation,destinationLocation):
-    originCode = towns[startLocation]["code"]
-    originName = towns[startLocation]["name"]
-    destinationCode = towns[destinationLocation]["code"]
-    destinationName = towns[destinationLocation]["name"]
-
-    tdate = conv_TDate(date)
-
-    data = '{"origin":"'+originName+'","originCode":"'+originCode+'",' \
-           '"originLocation":{"id":null,"label":null,"longitude":null,' \
-           '"latitude":null,"type":"G","country":null,' \
-           '"stationCode":"'+originCode+'","stationLabel":null},' \
-           '"destination":"'+destinationName+'",' \
-           '"destinationCode":"'+destinationCode+'",' \
-           '"destinationLocation":' \
-           '{  "id":null,' \
-           '"label":null,' \
-           '"longitude":null,' \
-           '"latitude":null,' \
-           '"type":"G",' \
-           '"country":null,' \
-           '"stationCode":"'+destinationCode+'",' \
-           '"stationLabel":null},' \
-           '"via":null,' \
-           '"viaCode":null,' \
-           '"viaLocation":null,' \
-           '"directTravel":false,' \
-           '"asymmetrical":false,' \
-           '"professional":false,' \
-           '"customerAccount":false,' \
-           '"oneWayTravel":true,' \
-           '"departureDate":"'+tdate+'",' \
-           '"returnDate":null,' \
-           '"travelClass":"SECOND",' \
-           '"country":"FR",' \
-           '"language":"fr",' \
-           '"busBestPriceOperator":null,' \
-           '"passengers":' \
-           '[{"travelerId":null,' \
-           '"profile":"YOUNG",' \
-           '"age":null,' \
-           '"birthDate":null,' \
-           '"fidelityCardType":"NONE",' \
-           '"fidelityCardNumber":null,' \
-           '"commercialCardNumber":"",' \
-           '"commercialCardType":"YOUNGS",' \
-           '"promoCode":null,' \
-           '"lastName":null,' \
-           '"firstName":null,' \
-           '"phoneNumer":null,' \
-           '"hanInformation":null}],' \
-           '"animals":[],' \
-           '"bike":"NONE",' \
-           '"withRecliningSeat":false,' \
-           '"physicalSpace":null,' \
-           '"fares":[],' \
-           '"withBestPrices":false,' \
-           '"highlightedTravel":null,' \
-           '"nextOrPrevious":false,' \
-           '"source":"FORM_SUBMIT",' \
-           '"targetPrice":null,' \
-           '"han":false,' \
-           '"outwardScheduleType":"BY_DEPARTURE_DATE",' \
-           '"inwardScheduleType":"BY_DEPARTURE_DATE",' \
-           '"currency":null,' \
-           '"codeFce":null,' \
-           '"companions":[],' \
-           '"asymetricalItinerary":{}}'
-
-    return data
-
-
-def query(date,startLocation,endLocation):
-    headers = {'Content-Type': 'application/json',}
-    data = createReqData(date,startLocation,endLocation)
-    response = requests.post(sncfURL, headers=headers, data=data)
-    return response
-
-
-
-def getTrainData(train):
-    trainData={}
-    #train numbers
-    trainData["numbers"]=[]
+def get_train_data(train):
+    train_data={}
+    # train numbers
+    train_data["numbers"]=[]
     for data in train["segments"] :
-        trainData["numbers"].append(data["trainNumber"])
-    #train type
-    trainData["type"]=train["transporters"]
-    #train stations
-    trainData["originCode"]=train["segments"][0]["originStationCode"]
-    trainData["destinationCode"]=train["segments"][-1]["destinationStationCode"]
-    #train date
-    trainData["departureDate"]=conv_Date(train['departureDate'])
-    trainData["arrivalDate"]=conv_Date(train['arrivalDate'])
-    #train duration
-    trainData["minuteDuration"]=train['minuteDuration']
-    #train prices
-    trainData["prices"]=[]
+        train_data["numbers"].append(data["trainNumber"])
+    # train type
+    train_data["type"]=train["transporters"]
+    # train_data
+    train_data["origin_code"]=train["segments"][0]["originStationCode"]
+    train_data["destination_code"]=train["segments"][-1]["destinationStationCode"]
+    # train date
+    train_data["departureDate"]=Date.tdate_to_date(train['departureDate'])
+    train_data["arrivalDate"]=Date.tdate_to_date(train['arrivalDate'])
+    # train duration
+    train_data["minuteDuration"]=train['minuteDuration']
+    # train prices
+    train_data["prices"]=[]
     for offer in train["priceProposals"]:
         price = offer["amount"]
         remaining = offer["remainingSeat"]
-        trainData["prices"].append((price,remaining))
+        train_data["prices"].append((price, remaining))
+    return train_data
 
-    return trainData
 
-#return a toString of train data
-def train_String(trainData):
-    duration = str(trainData["minuteDuration"]//60) +"h"+str(trainData["minuteDuration"]%60)
-    string = "Train ("+",".join(trainData["type"])+") numero "+",".join(trainData["numbers"])+":\n"+"Depart de "+trainData["originCode"]+" : "+trainData["departureDate"]+"\n"+"Arrivee a "+trainData["destinationCode"]+" : " + trainData["arrivalDate"]+"\n"+"Duree : "+duration+"\n"+"Prix :\n"
-    for price in trainData["prices"]:
+# return a toString of train data
+def train_to_string(train_data):
+    duration = str(train_data["minuteDuration"]//60) +"h"+str(train_data["minuteDuration"]%60)
+    string = "Train ("+",".join(train_data["type"])+") numero "+",".join(train_data["numbers"])+":\n"+"Depart de "+train_data["origin_code"]+" : "+train_data["departureDate"]+"\n"+"Arrivee a "+train_data["destination_code"]+" : " + train_data["arrivalDate"]+"\n"+"Duree : "+duration+"\n"+"Prix :\n"
+    for price in train_data["prices"]:
         string+= str(price[1]) + " restants à "+str(price[0])+"e\n"
-    #print(string)
+    # print(string)
     return string
 
 
-def getTrainsData(date,startLocation,endLocation):
+def get_trains_data(date,origin_name,destination_name):
     print("Getting response...")
-    response = query(date,startLocation,endLocation)
-    trains = response.json()["trainProposals"]
-    trainsData = []
+    origin_code = Station.get_code_by_name(origin_name)
+    destination_code = Station.get_code_by_name(destination_name)
+    trains = Travel.search(date, origin_code, destination_code)
+    trains_data = []
     for train in trains :
-        trainsData.append(getTrainData(train))
-    return trainsData
+        trains_data.append(get_train_data(train))
+    return trains_data
 
-#return a toString of trains data
-def trains_String(date,startLocation,endLocation):
-    data = getTrainsData(date,startLocation,endLocation)
+
+# return a toString of trains data
+def trains_to_string(date,origin_name,destination_name):
+    data = get_trains_data(date,origin_name,destination_name)
     string=""
     for k in range(len(data)):
         train = data[k]
-        string+= train_String(train)+"\n"
+        string+= train_to_string(train)+"\n"
     print(string)
 
-trains_String(dt.datetime.today(),"Paris","Brest")
+
+trains_to_string(dt.datetime.today(),"Paris (toutes gares intramuros)","Rennes (Bretagne)")
+
+
+
