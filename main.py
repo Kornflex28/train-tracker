@@ -14,11 +14,12 @@ towns = {"Paris" : {"code":"FRPAR","name":"Paris (Toutes gares intramuros)"},"Br
 #date = datetime
 def conv_TDate(date):
     return str(date)[:10]+"T"+str(date)[11:19]
-    
+
 #return date in string
 def conv_Date(tdate):
+    print(tdate)
     return tdate[:10]+" "+tdate[11:19]
-    
+
 #Return the data for the request
 #startLocation : string
 #endLocation : string
@@ -28,19 +29,79 @@ def createReqData(date,startLocation,destinationLocation):
     originName = towns[startLocation]["name"]
     destinationCode = towns[destinationLocation]["code"]
     destinationName = towns[destinationLocation]["name"]
-    
+
     tdate = conv_TDate(date)
-    
-    data = '{"origin":"'+originName+'","originCode":"'+originCode+'","originLocation":{"id":null,"label":null,"longitude":null,"latitude":null,"type":"G","country":null,"stationCode":"'+originCode+'","stationLabel":null},"destination":"'+destinationName+'","destinationCode":"'+destinationCode+'","destinationLocation":{"id":null,"label":null,"longitude":null,"latitude":null,"type":"G","country":null,"stationCode":"'+destinationCode+'","stationLabel":null},"via":null,"viaCode":null,"viaLocation":null,"directTravel":false,"asymmetrical":false,"professional":false,"customerAccount":false,"oneWayTravel":true,"departureDate":"'+tdate+'","returnDate":null,"travelClass":"SECOND","country":"FR","language":"fr","busBestPriceOperator":null,"passengers":[{"travelerId":null,"profile":"YOUNG","age":null,"birthDate":null,"fidelityCardType":"NONE","fidelityCardNumber":null,"commercialCardNumber":"","commercialCardType":"YOUNGS","promoCode":null,"lastName":null,"firstName":null,"phoneNumer":null,"hanInformation":null}],"animals":[],"bike":"NONE","withRecliningSeat":false,"physicalSpace":null,"fares":[],"withBestPrices":false,"highlightedTravel":null,"nextOrPrevious":false,"source":"FORM_SUBMIT","targetPrice":null,"han":false,"outwardScheduleType":"BY_DEPARTURE_DATE","inwardScheduleType":"BY_DEPARTURE_DATE","currency":null,"codeFce":null,"companions":[],"asymetricalItinerary":{}}'
-    
+
+    data = '{"origin":"'+originName+'","originCode":"'+originCode+'",' \
+           '"originLocation":{"id":null,"label":null,"longitude":null,' \
+           '"latitude":null,"type":"G","country":null,' \
+           '"stationCode":"'+originCode+'","stationLabel":null},' \
+           '"destination":"'+destinationName+'",' \
+           '"destinationCode":"'+destinationCode+'",' \
+           '"destinationLocation":' \
+           '{  "id":null,' \
+           '"label":null,' \
+           '"longitude":null,' \
+           '"latitude":null,' \
+           '"type":"G",' \
+           '"country":null,' \
+           '"stationCode":"'+destinationCode+'",' \
+           '"stationLabel":null},' \
+           '"via":null,' \
+           '"viaCode":null,' \
+           '"viaLocation":null,' \
+           '"directTravel":false,' \
+           '"asymmetrical":false,' \
+           '"professional":false,' \
+           '"customerAccount":false,' \
+           '"oneWayTravel":true,' \
+           '"departureDate":"'+tdate+'",' \
+           '"returnDate":null,' \
+           '"travelClass":"SECOND",' \
+           '"country":"FR",' \
+           '"language":"fr",' \
+           '"busBestPriceOperator":null,' \
+           '"passengers":' \
+           '[{"travelerId":null,' \
+           '"profile":"YOUNG",' \
+           '"age":null,' \
+           '"birthDate":null,' \
+           '"fidelityCardType":"NONE",' \
+           '"fidelityCardNumber":null,' \
+           '"commercialCardNumber":"",' \
+           '"commercialCardType":"YOUNGS",' \
+           '"promoCode":null,' \
+           '"lastName":null,' \
+           '"firstName":null,' \
+           '"phoneNumer":null,' \
+           '"hanInformation":null}],' \
+           '"animals":[],' \
+           '"bike":"NONE",' \
+           '"withRecliningSeat":false,' \
+           '"physicalSpace":null,' \
+           '"fares":[],' \
+           '"withBestPrices":false,' \
+           '"highlightedTravel":null,' \
+           '"nextOrPrevious":false,' \
+           '"source":"FORM_SUBMIT",' \
+           '"targetPrice":null,' \
+           '"han":false,' \
+           '"outwardScheduleType":"BY_DEPARTURE_DATE",' \
+           '"inwardScheduleType":"BY_DEPARTURE_DATE",' \
+           '"currency":null,' \
+           '"codeFce":null,' \
+           '"companions":[],' \
+           '"asymetricalItinerary":{}}'
+
     return data
-    
+
+
 def query(date,startLocation,endLocation):
     headers = {'Content-Type': 'application/json',}
     data = createReqData(date,startLocation,endLocation)
     response = requests.post(sncfURL, headers=headers, data=data)
     return response
-    
+
 
 
 def getTrainData(train):
@@ -65,9 +126,9 @@ def getTrainData(train):
         price = offer["amount"]
         remaining = offer["remainingSeat"]
         trainData["prices"].append((price,remaining))
-    
+
     return trainData
-    
+
 #return a toString of train data
 def train_String(trainData):
     duration = str(trainData["minuteDuration"]//60) +"h"+str(trainData["minuteDuration"]%60)
@@ -76,8 +137,8 @@ def train_String(trainData):
         string+= str(price[1]) + " restants à "+str(price[0])+"e\n"
     #print(string)
     return string
-    
-    
+
+
 def getTrainsData(date,startLocation,endLocation):
     print("Getting response...")
     response = query(date,startLocation,endLocation)
@@ -95,5 +156,5 @@ def trains_String(date,startLocation,endLocation):
         train = data[k]
         string+= train_String(train)+"\n"
     print(string)
-    
+
 trains_String(dt.datetime.today(),"Paris","Brest")
