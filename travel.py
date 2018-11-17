@@ -9,7 +9,15 @@ class Travel:
     url = 'https://www.oui.sncf/proposition/rest/search-travels/outward'
 
     @staticmethod
-    def search(date, origin_code, destination_code):
+    def search(date: dt.datetime, origin_code: str, destination_code: str) \
+            -> list:
+        """
+        Search for trains
+        :param date: date to search, datetime object
+        :param origin_code: code of the origin (i.e. FRXXX)
+        :param destination_code: code of the destination (i.e. FRXXX)
+        :return: list of available trains
+        """
         origin = {"code": origin_code,
                   "name": Station.get_name_by_code(origin_code)}
         destination = {"code": destination_code,
@@ -17,13 +25,13 @@ class Travel:
         response_json = Travel._query(date, origin, destination).json()
         if "trainProposals" in response_json:
             trains = response_json["trainProposals"]
-            print(trains)
+            return trains
         else:
             raise ValueError('Bad response from request')
 
-
     @staticmethod
-    def _query(date, origin, destination):
+    def _query(date: dt.datetime, origin: dict, destination: dict) \
+            -> requests.models.Response:
         """
         Request the API to get all travels
         :param date: date to search, datetime object
