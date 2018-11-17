@@ -122,7 +122,7 @@ def getTrainData(train):
     trainData["minuteDuration"]=train['minuteDuration']
     #train prices
     trainData["prices"]=[]
-    for offer in train["priceProposals"] :
+    for offer in train["priceProposals"]:
         price = offer["amount"]
         remaining = offer["remainingSeat"]
         trainData["prices"].append((price,remaining))

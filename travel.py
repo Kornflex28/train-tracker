@@ -1,21 +1,49 @@
 from date import Date
 import datetime as dt
+import requests
+from station import Station
 
 
 class Travel:
 
+    url = 'https://www.oui.sncf/proposition/rest/search-travels/outward'
+
+    @staticmethod
+    def search(date, origin_code, destination_code):
+        origin = {"code": origin_code,
+                  "name": Station.get_name_by_code(origin_code)}
+        destination = {"code": destination_code,
+                       "name": Station.get_name_by_code(destination_code)}
+        response_json = Travel._query(date, origin, destination).json()
+        if "trainProposals" in response_json:
+            trains = response_json["trainProposals"]
+            print(trains)
+        else:
+            raise ValueError('Bad response from request')
+
+
     @staticmethod
     def _query(date, origin, destination):
-        pass
+        """
+        Request the API to get all travels
+        :param date: date to search, datetime object
+        :param origin: dictionary with name and code
+        :param destination: dictionary with name and code
+        :return: Response of the request
+        """
+        headers = {'Content-Type': 'application/json', }
+        data = Travel._create_data(date, origin, destination)
+        response = requests.post(Travel.url, headers=headers, data=data)
+        return response
 
     @staticmethod
     def _create_data(date: dt.datetime, origin: dict, destination: dict) -> str:
         """
-
-        :param date: date to search
+        Create the request data
+        :param date: date to search, datetime object
         :param origin: dictionary with name and code
         :param destination: dictionary with name and code
-        :return:
+        :return: return the data field
         """
         data = '{"origin":"' + origin['name'] + '",' \
                '"originCode":"' + origin['code'] + '",' \
@@ -41,7 +69,7 @@ class Travel:
                '"professional":false,' \
                '"customerAccount":false,' \
                '"oneWayTravel":true,' \
-               '"departureDate":"' + Date.date_to_tdate(date) + '",' \
+               '"departureDate":"' + Date.datetime_to_tdate(date) + '",' \
                '"returnDate":null,' \
                '"travelClass":"SECOND",' \
                '"country":"FR",' \
