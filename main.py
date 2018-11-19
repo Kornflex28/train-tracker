@@ -1,9 +1,7 @@
 ###
-import datetime as dt
+from date import DateTime
 from station import Station
 from travel import Travel
-from date import Date
-
 
 
 def get_train_data(train):
@@ -18,8 +16,8 @@ def get_train_data(train):
     train_data["origin_code"]=train["segments"][0]["originStationCode"]
     train_data["destination_code"]=train["segments"][-1]["destinationStationCode"]
     # train date
-    train_data["departureDate"]=Date.tdate_to_date(train['departureDate'])
-    train_data["arrivalDate"]=Date.tdate_to_date(train['arrivalDate'])
+    train_data["departureDate"]=DateTime.tdate_to_date(train['departureDate'])
+    train_data["arrivalDate"]=DateTime.tdate_to_date(train['arrivalDate'])
     # train duration
     train_data["minuteDuration"]=train['minuteDuration']
     # train prices
@@ -39,7 +37,6 @@ def train_to_string(train_data):
         string+= str(price[1]) + " restants à "+str(price[0])+"e\n"
     # print(string)
     return string
-
 
 
 def get_trains_data(date,origin_name,destination_name):
@@ -63,7 +60,7 @@ def trains_to_string(date,origin_name,destination_name):
     print(string.encode("utf-8"))
 
 
-trains_to_string(dt.datetime(2018, 12, 5, 7, 0, 0), "Paris (toutes gares intramuros)", "Rennes (Bretagne)")
+trains_to_string(DateTime(2018, 12, 5, 7, 0, 0), "Paris (toutes gares intramuros)", "Rennes (Bretagne)")
 
 
 

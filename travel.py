@@ -1,5 +1,4 @@
-from date import Date
-import datetime as dt
+from date import DateTime
 import requests
 from station import Station
 
@@ -9,7 +8,7 @@ class Travel:
     url = 'https://www.oui.sncf/proposition/rest/search-travels/outward'
 
     @staticmethod
-    def search(date: dt.datetime, origin_code: str, destination_code: str) \
+    def search(date: DateTime, origin_code: str, destination_code: str) \
             -> list:
         """
         Search for trains
@@ -30,7 +29,7 @@ class Travel:
             raise ValueError('Bad response from request')
 
     @staticmethod
-    def _query(date: dt.datetime, origin: dict, destination: dict) \
+    def _query(date: DateTime, origin: dict, destination: dict) \
             -> requests.models.Response:
         """
         Request the API to get all travels
@@ -45,7 +44,7 @@ class Travel:
         return response
 
     @staticmethod
-    def _create_data(date: dt.datetime, origin: dict, destination: dict) -> str:
+    def _create_data(date: DateTime, origin: dict, destination: dict) -> str:
         """
         Create the request data
         :param date: date to search, datetime object
@@ -77,7 +76,7 @@ class Travel:
                '"professional":false,' \
                '"customerAccount":false,' \
                '"oneWayTravel":true,' \
-               '"departureDate":"' + Date.datetime_to_tdate(date) + '",' \
+               '"departureDate":"' + date.to_tdate() + '",' \
                '"returnDate":null,' \
                '"travelClass":"SECOND",' \
                '"country":"FR",' \
