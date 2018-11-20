@@ -1,6 +1,6 @@
 ###
 from date import DateTime
-from station import Station
+from station_static import Station
 from travel import Travel
 
 

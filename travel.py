@@ -1,6 +1,6 @@
 from date import DateTime
 import requests
-from station import Station
+from station_static import Station
 
 
 class Travel:
