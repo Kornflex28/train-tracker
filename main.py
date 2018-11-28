@@ -1,7 +1,10 @@
 ###
 from date import DateTime
-from station_static import Station
+from database.Station import Station
 from travel import Travel
+from mongoengine import connect
+
+connect('train-tracker')
 
 
 def get_train_data(train):
@@ -56,7 +59,7 @@ def trains_to_string(date,origin_name,destination_name):
     string=""
     for k in range(len(data)):
         train = data[k]
-        string+= train_to_string(train)+"\n"
+        string += train_to_string(train)+"\n"
     print(string.encode("utf-8"))
 
 
