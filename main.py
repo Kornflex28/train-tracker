@@ -58,7 +58,7 @@ def trains_to_string(date,origin_name,destination_name):
     for k in range(len(data)):
         train = data[k]
         string += train_to_string(train)+"\n"
-    print(string.encode("utf-8"))
+    print(string)
 
 
 trains_to_string(DateTime(2018, 12, 5, 7, 0, 0), "Paris (toutes gares intramuros)", "Rennes (Bretagne)")
