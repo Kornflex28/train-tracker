@@ -1,5 +1,6 @@
 from mongoengine import *
 
+
 class TrainRecord(Document):
     origin = ReferenceField('Station', reverse_delete_rule=DO_NOTHING)
     destination = ReferenceField('Station', reverse_delete_rule=DO_NOTHING)

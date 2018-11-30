@@ -1,8 +1,11 @@
 ###
-from date import DateTime
+import sys
+sys.path.append('..')
+
+import utils.credentials
+from utils.date import DateTime
 from database.Station import Station
-from travel import Travel
-import credentials
+from cron.travel import Travel
 
 
 def get_train_data(train):

@@ -1,7 +1,5 @@
 from database.Station import *
 import json
-import credentials
-
 
 stations = json.load(open('station.json'))
 

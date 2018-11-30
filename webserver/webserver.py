@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask
 from flask_restful import Resource, Api
 from mongoengine import *
 import json
@@ -8,7 +8,6 @@ import sys
 sys.path.append('..')
 
 from database.Request import Request
-import credentials
 
 app = Flask(__name__)
 api = Api(app)
