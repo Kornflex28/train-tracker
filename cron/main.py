@@ -64,7 +64,7 @@ def trains_to_string(date,origin_name,destination_name):
     print(string)
 
 
-trains_to_string(DateTime(2018, 12, 5, 7, 0, 0), "Paris (toutes gares intramuros)", "Rennes (Bretagne)")
+trains_to_string(DateTime(2018, 12, 5, 7, 0, 0), "Paris (toutes gares intramuros)", "Albi Ville (Occitanie)")
 
 
 
