@@ -8,6 +8,7 @@ import sys
 sys.path.append('..')
 
 from database.Request import Request
+import credentials
 
 app = Flask(__name__)
 api = Api(app)

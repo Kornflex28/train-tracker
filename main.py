@@ -2,9 +2,7 @@
 from date import DateTime
 from database.Station import Station
 from travel import Travel
-from mongoengine import connect
-
-connect('train-tracker')
+import credentials
 
 
 def get_train_data(train):
