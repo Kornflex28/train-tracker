@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_restful import Resource, Api
 from mongoengine import *
 import json
@@ -23,5 +23,16 @@ class Requests(Resource):
 
 api.add_resource(Requests, '/requests')
 
+@app.route("/")
+@app.route("/home")
+def index():
+    return render_template("home.html", title="Home")
+
+
+@app.route("/about")
+def about():
+    return render_template("about.html",title="About")
+
+
 if __name__ == '__main__':
-    app.run(port='8080')
+    app.run(port='8080', debug=True)
