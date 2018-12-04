@@ -14,7 +14,7 @@ class Station(Document):
         """
         station = Station.objects(code=code).first()
         if station is None:
-            raise ValueError('This code doesn\'t exist')
+            raise ValueError('The code {} doesn\'t exist'.format(code))
         return station.name
 
     @staticmethod
@@ -26,7 +26,7 @@ class Station(Document):
         """
         station = Station.objects(name=name).first()
         if station is None:
-            raise ValueError('This name doesn\'t exist')
+            raise ValueError('The name {} doesn\'t exist'.format(name))
         return station.code
 
     @staticmethod
