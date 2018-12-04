@@ -8,7 +8,7 @@ import datetime as dt
 import sys
 sys.path.append('..')
 
-from database.Request import Request
+from database.Request import Request as dbRequest
 from database.Station import Station
 
 
@@ -23,7 +23,7 @@ parser.add_argument(name='origin', type=str, required=True, help="The code of th
 parser.add_argument(name='destination', type=str, required=True, help="The  code of the destination station")
 parser.add_argument(name='date', type=str, required=True,
                     help="The date of the first request; format : '%Y-%m-%d %H:%M:%S'")
-parser.add_argument(name='gapTime', type=int,
+parser.add_argument(name='gapTime', default=0, type=int,
                     help="The number of days you want to execute the request; 0 just for once")
 
 
@@ -33,29 +33,26 @@ class Requests(Resource):
 
     @staticmethod
     def get():
-        return json.loads(Request.objects.to_json())
+        return json.loads(dbRequest.objects.to_json())
 
     @staticmethod
     def post():
         args = parser.parse_args()
-        if args['gapTime'] is None:
-            args['gapTime'] = 0
 
         if args['gapTime'] == 0:
             unique_date = True
         else:
             unique_date = False
 
-        # errors Handled
-        origin_station = Station().get_name_by_code(code=args['origin'])
-        destination_station = Station().get_name_by_code(code=args['destination'])
+        origin_station = Station().get_station_by_code(args['origin'])
+        destination_station = Station().get_station_by_code(args['destination'])
 
-        request = Request(origin=origin_station,
+        request = dbRequest(origin=origin_station,
                           destination=destination_station,
                           uniqueDate=unique_date, date=dt.datetime.strptime(args['date'], "%Y-%m-%d %H:%M:%S"),
                           gapTime=args['gapTime'])
         request.save()
-        return request.to_json(), 201
+        return json.loads(request.to_json()), 201
 
 
 api.add_resource(Requests, '/requests')
@@ -66,7 +63,7 @@ api.add_resource(Requests, '/requests')
 class Request(Resource):
 
     def get(self, request_id):
-        return
+        return json.loads(dbRequest.objects(id=request_id).to_json())
 
     def delete(self, request_id):
         return

@@ -18,6 +18,18 @@ class Station(Document):
         return station.name
 
     @staticmethod
+    def get_station_by_code(code: str) -> str:
+        """
+        Get the Station object of the train station with its code
+        :param code: Code of the train station (i.e. FRADI)
+        :return: The object Station of the train station
+        """
+        station = Station.objects(code=code).first()
+        if station is None:
+            raise ValueError('The code {} doesn\'t exist'.format(code))
+        return station
+
+    @staticmethod
     def get_code_by_name(name: str) -> str:
         """
         Get the name of the train station with its name
@@ -28,6 +40,18 @@ class Station(Document):
         if station is None:
             raise ValueError('The name {} doesn\'t exist'.format(name))
         return station.code
+
+    @staticmethod
+    def get_station_by_name(name: str) -> str:
+        """
+        Get the Station object of the train station with its name
+        :param name: The train station name (i.e. Dunkerque (Hauts-de-France))
+        :return: The object Station of the train station
+        """
+        station = Station.objects(name=name).first()
+        if station is None:
+            raise ValueError('The code {} doesn\'t exist'.format(code))
+        return station
 
     @staticmethod
     def search_station(search_term: str) -> list:
