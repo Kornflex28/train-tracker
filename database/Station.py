@@ -18,7 +18,7 @@ class Station(Document):
         return station.name
 
     @staticmethod
-    def get_station_by_code(code: str) -> str:
+    def get_station_by_code(code: str):
         """
         Get the Station object of the train station with its code
         :param code: Code of the train station (i.e. FRADI)
@@ -42,7 +42,7 @@ class Station(Document):
         return station.code
 
     @staticmethod
-    def get_station_by_name(name: str) -> str:
+    def get_station_by_name(name: str):
         """
         Get the Station object of the train station with its name
         :param name: The train station name (i.e. Dunkerque (Hauts-de-France))
