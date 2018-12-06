@@ -9,7 +9,7 @@ class Station(Document):
     def get_name_by_code(code: str) -> str:
         """
         Get the name of the train station with its code
-        :param code: Code of the train station (i.e. FRADI)
+        :param: code: Code of the train station (i.e. FRADI)
         :return: The name of the train station
         """
         station = Station.objects(code=code).first()
