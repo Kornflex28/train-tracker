@@ -9,7 +9,9 @@ import sys
 sys.path.append('..')
 
 from database.Request import Request as dbRequest
-from database.Station import Station
+from database.Proposition import Proposition as dbProposision
+from database.TrainRecord import TrainRecord as dbTrainRecord
+from database.Station import Station as dbStation
 
 
 import utils.credentials
@@ -26,7 +28,7 @@ class Requests(Resource):
     def get():
         """
         Get the list of all the requests registered in the database.
-        :return: A JSON list of all the requests.
+        :return: A list of JSON each containing a request.
         """
         return json.loads(dbRequest.objects.to_json())
 
@@ -34,7 +36,7 @@ class Requests(Resource):
     def post():
         """
         Add a NEW request that will be registered in the database.
-        :param: You need several arguments to the POST request.
+        :param: Arguments of the POST request.
                 origin: Code of the origin station (i.e. FRADI) - Required
                 destination: Code of the destination station (i.e. FRAFJ) - Required
                 date: Date of the first request with the format %Y-%m-%d %H:%M:%S - Required
@@ -53,16 +55,16 @@ class Requests(Resource):
                                      help="The number of days you want to execute the request; 0 just for once")
         requests_args = requests_parser.parse_args()
 
-        # Get the corresponding Station object
-        origin_station = Station().get_station_by_code(requests_args['origin'])
-        destination_station = Station().get_station_by_code(requests_args['destination'])
+        # gets the corresponding Station object
+        origin_station = dbStation().get_station_by_code(requests_args['origin'])
+        destination_station = dbStation().get_station_by_code(requests_args['destination'])
 
         if requests_args['gapTime'] == 0:
             unique_date = True
         else:
             unique_date = False
 
-        # Check if the request already exists in the database
+        # checks if the request already exists in the database
         request_exist = dbRequest.objects(origin=origin_station,
                           destination=destination_station,
                           uniqueDate=unique_date, date=dt.datetime.strptime(requests_args['date'], "%Y-%m-%d %H:%M:%S"),
@@ -96,8 +98,8 @@ class Request(Resource):
     def get(request_id):
         """
         Get a single request registered in the database.
-        :param: request_id: Id of the request to update
-        :return: A JSON list of the request.
+        :param: request_id: Id of the request to get
+        :return: A JSON file of the request.
         """
         return json.loads(dbRequest.objects(id=request_id).first().to_json())
 
@@ -106,7 +108,7 @@ class Request(Resource):
         """
         Delete from the database a single request registered in the database.
         :param: request_id: Id of the request to delete
-        :return: A JSON list of the request.
+        :return: 204.
         """
         dbRequest.objects(id=request_id).delete()
         return "", 204
@@ -115,7 +117,7 @@ class Request(Resource):
     def put(request_id):
         """
         Update a request that is registered in the database.
-        :param: You need several arguments to the PUT request.
+        :param: Arguments of the PUT request.
         origin: Code of the origin station (i.e. FRADI) - Default is the request's one
         destination: Code of the destination station (i.e. FRAFJ) - Default is the request's one
         date: Date of the first request with the format %Y-%m-%d %H:%M:%S - Default is the request's one
@@ -151,8 +153,8 @@ class Request(Resource):
         else:
             unique_date = False
 
-        origin_station = Station().get_station_by_code(request_args['origin'])
-        destination_station = Station().get_station_by_code(request_args['destination'])
+        origin_station = dbStation().get_station_by_code(request_args['origin'])
+        destination_station = dbStation().get_station_by_code(request_args['destination'])
 
         dbRequest.objects(id=request_id).update_one(set__origin=origin_station,
                           set__destination=destination_station,
@@ -165,11 +167,105 @@ class Request(Resource):
 api.add_resource(Request, '/requests/<string:request_id>')
 
 
+# Stations
+# shows a list of stations and lets you POST to add new stations
+class Stations(Resource):
+    @staticmethod
+    def get():
+        """
+        Get the list of all the stations registered in the database.
+        :return: A list of JSON each containing a station.
+        """
+        return json.loads(dbStation.objects.to_json())
+
+    @staticmethod
+    def post():
+        """
+        Add a NEW station that will be registered in the database.
+        :param: Arguments of the POST request.
+                code: Code of the station (i.e. FRAFJ) - Required
+                name: Name of the station - Required
+        :return: A JSON file of the station newly registered.
+        """
+
+        # stations parser
+        stations_parser = reqparse.RequestParser()
+        stations_parser.add_argument(name='code', type=str, required=True, help="The  code of the station (i.e. FRAFJ)")
+        stations_parser.add_argument(name='name', type=str, required=True, help="The name of the station")
+        stations_args = stations_parser.parse_args()
+
+        # checks if the station already exists in the database
+        station_exist = dbStation.objects(code=stations_args['code'], name=stations_args['name']) is not None
+
+        if station_exist:
+            request_id = dbStation.objects(code=stations_args['code'], name=stations_args['name']).first().id
+            raise ValueError("The station already exists at id {}".format(request_id))
+        else:
+            station = dbStation(code=stations_args['code'], name=stations_args['name'])
+            station.save()
+            return json.loads(station.to_json()), 201
+
+
+api.add_resource(Stations, '/stations')
+
+
+# Station
+# shows a single station item and lets you PUT or DELETE a station item
+class Station(Resource):
+
+    @staticmethod
+    def get(station_id):
+        """
+        Get a single station registered in the database.
+        :param: station_id: Id of the station to get
+        :return: A JSON file of the station.
+        """
+        return json.loads(dbStation.objects(id=station_id).first().to_json())
+
+    @staticmethod
+    def delete(station_id):
+        """
+        Delete from the database a single station registered in the database.
+        :param: request_id: Id of the station to delete
+        :return: 204.
+        """
+        dbStation.objects(id=station_id).delete()
+        return "", 204
+
+    @staticmethod
+    def put(station_id):
+        """
+        Update a station that is registered in the database.
+        :param: code: Code of the origin station (i.e. FRADI) - Default is the station's one
+                name: Code of the destination station (i.e. FRAFJ) - Default is the station's one
+        :return: A JSON file of the station newly updated.
+        """
+
+        # stations parser
+        station_parser = reqparse.RequestParser()
+        station_parser.add_argument(name='code', type=str, help="The  code of the station (i.e. FRAFJ)")
+        station_parser.add_argument(name='name', type=str, help="The name of the station")
+        station_args = station_parser.parse_args()
+
+        station = dbStation.objects(id=station_id).first()
+
+        # get default values
+        if station_args['code'] is None:
+            station_args['code'] = station.code
+        if station_args['name'] is None:
+            station_args['name'] = station.name
+
+        dbStation.objects(id=station_id).update_one(set__code=station_args['code'], set__name=station_args['name'])
+        return json.loads(dbStation.objects(id=station_id).first().to_json())
+
+
+api.add_resource(Station, '/stations/<string:station_id>')
+
+
 @app.route("/")
 @app.route("/home")
 def home():
     return render_template("home.html", title="Home")
-
 
 
 @app.route("/about")
