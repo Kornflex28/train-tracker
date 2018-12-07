@@ -1,18 +1,16 @@
 from flask import Flask, render_template
 from flask_restful import Resource, Api, reqparse
-from mongoengine import *
-
 import json
 import datetime as dt
+from mongoengine import *
 
 import sys
 sys.path.append('..')
 
 from database.Request import Request as dbRequest
-from database.Proposition import Proposition as dbProposision
-from database.TrainRecord import TrainRecord as dbTrainRecord
 from database.Station import Station as dbStation
-
+from database.Proposition import Proposition as dbProposition
+from database.TrainRecord import TrainRecord as dbTrainRecord
 
 import utils.credentials
 
@@ -21,7 +19,7 @@ api = Api(app)
 
 
 # Requests
-# shows a list of requests and lets you POST to add new requests
+# shows a list of requests and lets you POST to add new requests in the database
 class Requests(Resource):
 
     @staticmethod
@@ -30,7 +28,7 @@ class Requests(Resource):
         Get the list of all the requests registered in the database.
         :return: A list of JSON each containing a request.
         """
-        return json.loads(dbRequest.objects.to_json())
+        return json.loads(dbRequest.objects.to_json()), 200
 
     @staticmethod
     def post():
@@ -65,10 +63,10 @@ class Requests(Resource):
             unique_date = False
 
         # checks if the request already exists in the database
-        request_exist = dbRequest.objects(origin=origin_station,
-                          destination=destination_station,
-                          uniqueDate=unique_date, date=dt.datetime.strptime(requests_args['date'], "%Y-%m-%d %H:%M:%S"),
-                          gapTime=requests_args['gapTime']) is not None
+        request_exist = dbRequest.objects(origin=origin_station, destination=destination_station,
+                                          uniqueDate=unique_date,
+                                          date=dt.datetime.strptime(requests_args['date'], "%Y-%m-%d %H:%M:%S"),
+                                          gapTime=requests_args['gapTime']).first() is not None
 
         if request_exist:
             request_id = dbRequest.objects(origin=origin_station,
@@ -76,7 +74,7 @@ class Requests(Resource):
                                            uniqueDate=unique_date,
                                            date=dt.datetime.strptime(requests_args['date'], "%Y-%m-%d %H:%M:%S"),
                                            gapTime=requests_args['gapTime']).first().id
-            raise ValueError("The request already exists at id {}".format(request_id))
+            return "The request already exists at id {}".format(request_id), 208
         else:
             request = dbRequest(origin=origin_station,
                                 destination=destination_station,
@@ -91,7 +89,7 @@ api.add_resource(Requests, '/requests')
 
 
 # Request
-# shows a single request item and lets you PUT or DELETE a request item
+# shows a single request item and lets you PUT or DELETE a request item in the database
 class Request(Resource):
 
     @staticmethod
@@ -101,7 +99,10 @@ class Request(Resource):
         :param: request_id: Id of the request to get
         :return: A JSON file of the request.
         """
-        return json.loads(dbRequest.objects(id=request_id).first().to_json())
+        if dbRequest.objects(id=request_id).first() is not None:
+            return json.loads(dbRequest.objects(id=request_id).first().to_json()), 200
+        else:
+            raise ValueError("404 - Request not found at this id {}".format(request_id))
 
     @staticmethod
     def delete(request_id):
@@ -128,12 +129,11 @@ class Request(Resource):
         # request parser
         request_parser = reqparse.RequestParser()
         request_parser.add_argument(name='origin', type=str, help="The code of the origin station")
-        request_parser.add_argument(name='destination', type=str,
-                                     help="The  code of the destination station")
+        request_parser.add_argument(name='destination', type=str, help="The  code of the destination station")
         request_parser.add_argument(name='date', type=str,
-                                     help="The date of the first request; format : '%Y-%m-%d %H:%M:%S'")
+                                    help="The date of the first request; format : '%Y-%m-%d %H:%M:%S'")
         request_parser.add_argument(name='gapTime', type=int,
-                                     help="The number of days you want to execute the request; 0 just for once")
+                                    help="The number of days you want to execute the request; 0 just for once")
         request_args = request_parser.parse_args()
 
         request = dbRequest.objects(id=request_id).first()
@@ -157,18 +157,18 @@ class Request(Resource):
         destination_station = dbStation().get_station_by_code(request_args['destination'])
 
         dbRequest.objects(id=request_id).update_one(set__origin=origin_station,
-                          set__destination=destination_station,
-                          set__uniqueDate=unique_date,
-                          set__date=dt.datetime.strptime(request_args['date'], "%Y-%m-%d %H:%M:%S"),
-                          set__gapTime=request_args['gapTime'])
-        return json.loads(dbRequest.objects(id=request_id).first().to_json())
+                                                    set__destination=destination_station, set__uniqueDate=unique_date,
+                                                    set__date=dt.datetime.strptime(request_args['date'],
+                                                                                   "%Y-%m-%d %H:%M:%S"),
+                                                    set__gapTime=request_args['gapTime'])
+        return json.loads(dbRequest.objects(id=request_id).first().to_json()), 200
 
 
 api.add_resource(Request, '/requests/<string:request_id>')
 
 
 # Stations
-# shows a list of stations and lets you POST to add new stations
+# shows a list of stations and lets you POST to add new stations in the database
 class Stations(Resource):
     @staticmethod
     def get():
@@ -176,7 +176,7 @@ class Stations(Resource):
         Get the list of all the stations registered in the database.
         :return: A list of JSON each containing a station.
         """
-        return json.loads(dbStation.objects.to_json())
+        return json.loads(dbStation.objects.to_json()), 200
 
     @staticmethod
     def post():
@@ -195,11 +195,11 @@ class Stations(Resource):
         stations_args = stations_parser.parse_args()
 
         # checks if the station already exists in the database
-        station_exist = dbStation.objects(code=stations_args['code'], name=stations_args['name']) is not None
+        station_exist = dbStation.objects(code=stations_args['code'], name=stations_args['name']).first() is not None
 
         if station_exist:
-            request_id = dbStation.objects(code=stations_args['code'], name=stations_args['name']).first().id
-            raise ValueError("The station already exists at id {}".format(request_id))
+            station_id = dbStation.objects(code=stations_args['code'], name=stations_args['name']).first().id
+            return "The station already exists at id {}".format(station_id), 208
         else:
             station = dbStation(code=stations_args['code'], name=stations_args['name'])
             station.save()
@@ -210,7 +210,7 @@ api.add_resource(Stations, '/stations')
 
 
 # Station
-# shows a single station item and lets you PUT or DELETE a station item
+# shows a single station item and lets you PUT or DELETE a station item in the database
 class Station(Resource):
 
     @staticmethod
@@ -220,7 +220,10 @@ class Station(Resource):
         :param: station_id: Id of the station to get
         :return: A JSON file of the station.
         """
-        return json.loads(dbStation.objects(id=station_id).first().to_json())
+        if dbStation.objects(id=station_id).first() is not None:
+            return json.loads(dbStation.objects(id=station_id).first().to_json()), 200
+        else:
+            raise ValueError("404 - Station not found at this id {}".format(station_id))
 
     @staticmethod
     def delete(station_id):
@@ -241,7 +244,7 @@ class Station(Resource):
         :return: A JSON file of the station newly updated.
         """
 
-        # stations parser
+        # station parser
         station_parser = reqparse.RequestParser()
         station_parser.add_argument(name='code', type=str, help="The  code of the station (i.e. FRAFJ)")
         station_parser.add_argument(name='name', type=str, help="The name of the station")
@@ -256,10 +259,115 @@ class Station(Resource):
             station_args['name'] = station.name
 
         dbStation.objects(id=station_id).update_one(set__code=station_args['code'], set__name=station_args['name'])
-        return json.loads(dbStation.objects(id=station_id).first().to_json())
+        return json.loads(dbStation.objects(id=station_id).first().to_json()), 200
 
 
 api.add_resource(Station, '/stations/<string:station_id>')
+
+
+# Propositions
+# shows a list of propositions and lets you POST to add new propositions in the database
+class Propositions(Resource):
+    @staticmethod
+    def get():
+        """
+        Get the list of all the propositions registered in the database.
+        :return: A list of JSON each containing a proposition.
+        """
+        return json.loads(dbProposition.objects.to_json()), 200
+
+    @staticmethod
+    def post():
+        """
+        Add a NEW proposition that will be registered in the database.
+        :param: Arguments of the POST request.
+                amount: Price of the proposition - Required
+                remainingSeat: Number of remaining seats for the proposition - Required
+        :return: A JSON file of the proposition newly registered.
+        """
+
+        # propositions parser
+        propositions_parser = reqparse.RequestParser()
+        propositions_parser.add_argument(name='amount', type=int, required=True, help="The  price of the proposition")
+        propositions_parser.add_argument(name='remainingSeat', type=float, required=True,
+                                         help="The  number of remaining seats for the proposition")
+        propositions_args = propositions_parser.parse_args()
+
+        # checks if the proposition already exists in the database
+        proposition_exist = dbProposition.objects(amount=propositions_args['amount'],
+                                                  remainingSeat=propositions_args['remainingSeat']).first() is not None
+        print(proposition_exist, dbProposition.objects(amount=propositions_args['amount'],
+                                                       remainingSeat=propositions_args['remainingSeat']))
+        if proposition_exist:
+            proposition_id = dbProposition.objects(amount=propositions_args['amount'],
+                                                   remainingSeat=propositions_args['remainingSeat']).first().id
+            return "The proposition already exists at id {}".format(proposition_id), 208
+        else:
+            proposition = dbProposition(amount=propositions_args['amount'],
+                                        remainingSeat=propositions_args['remainingSeat'])
+            proposition.save()
+            return json.loads(proposition.to_json()), 201
+
+
+api.add_resource(Propositions, '/propositions')
+
+
+# Proposition
+# shows a single proposition item and lets you PUT or DELETE a proposition item in the database
+class Proposition(Resource):
+
+    @staticmethod
+    def get(proposition_id):
+        """
+        Get a single proposition registered in the database.
+        :param: proposition_id: Id of the proposition to get
+        :return: A JSON file of the proposition.
+        """
+        if dbProposition.objects(id=proposition_id).first() is not None:
+            return json.loads(dbProposition.objects(id=proposition_id).first().to_json()), 200
+        else:
+            raise ValueError("404 - Proposition not found at this id {}".format(proposition_id))
+
+    @staticmethod
+    def delete(proposition_id):
+        """
+        Delete from the database a single proposition registered in the database.
+        :param: proposition_id: Id of the proposition to delete
+        :return: 204.
+        """
+        dbProposition.objects(id=proposition_id).delete()
+        return "", 204
+
+    @staticmethod
+    def put(proposition_id):
+        """
+        Update a proposition that is registered in the database.
+        :param: amount: Price of the proposition - Default is the proposition's one
+                remainingSeat: Number of remaining seats for the proposition - Default is the proposition's one
+        :return: A JSON file of the proposition newly updated.
+        """
+
+        # proposition parser
+        proposition_parser = reqparse.RequestParser()
+        proposition_parser.add_argument(name='amount', type=int, help="The  price of the proposition")
+        proposition_parser.add_argument(name='remainingSeat', type=float,
+                                        help="The  number of remaining seats for the proposition")
+        proposition_args = proposition_parser.parse_args()
+
+        proposition = dbProposition.objects(id=proposition_id).first()
+
+        # get default values
+        if proposition_args['amount'] is None:
+            proposition_args['amount'] = proposition.amount
+        if proposition_args['remainingSeat'] is None:
+            proposition_args['remainingSeat'] = proposition.remainingSeat
+
+        dbProposition.objects(id=proposition_id).update_one(set__amount=proposition_args['amount'],
+                                                            set__remainingSeat=proposition_args['remainingSeat'])
+        return json.loads(dbProposition.objects(id=proposition_id).first().to_json()), 200
+
+
+api.add_resource(Proposition, '/propositions/<string:proposition_id>')
 
 
 @app.route("/")
