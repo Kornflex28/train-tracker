@@ -370,6 +370,51 @@ class Proposition(Resource):
 api.add_resource(Proposition, '/propositions/<string:proposition_id>')
 
 
+# TrainRecords
+# shows a list of train records in the database
+class TrainRecords(Resource):
+    @staticmethod
+    def get():
+        """
+        Get the list of all the train records registered in the database.
+        :return: A list of JSON each containing a train record.
+        """
+        return json.loads(dbTrainRecord.objects.to_json()), 200
+
+
+api.add_resource(TrainRecords, '/trainrecords')
+
+
+# TrainRecord
+# shows a single train record item and lets you  DELETE a train record item in the database
+class TrainRecord(Resource):
+
+    @staticmethod
+    def get(trainrecord_id):
+        """
+        Get a single train record registered in the database.
+        :param: trainrecord_id: Id of the train record to get
+        :return: A JSON file of the train record.
+        """
+        if dbTrainRecord.objects(id=trainrecord_id).first() is not None:
+            return json.loads(dbTrainRecord.objects(id=trainrecord_id).first().to_json()), 200
+        else:
+            raise ValueError("404 - Train record not found at this id {}".format(trainrecord_id))
+
+    @staticmethod
+    def delete(trainrecord_id):
+        """
+        Delete from the database a single train record registered in the database.
+        :param: trainrecord_id: Id of the train record to delete
+        :return: 204.
+        """
+        dbTrainRecord.objects(id=trainrecord_id).delete()
+        return "", 204
+
+
+api.add_resource(TrainRecord, '/trainrecords/<string:trainrecord_id>')
+
+
 @app.route("/")
 @app.route("/home")
 def home():
