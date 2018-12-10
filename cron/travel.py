@@ -7,6 +7,15 @@ class Travel:
 
     url = 'https://www.oui.sncf/proposition/rest/search-travels/outward'
 
+    def __init__(self, date: DateTime, origin_code: str, destination_code: str):
+        self.date = date
+        self.origin_code = origin_code
+        self.destination_code = destination_code
+
+    def get(self):
+        Travel.search(self.date, self.origin_code, self.destination_code)
+
+
     @staticmethod
     def search(date: DateTime, origin_code: str, destination_code: str) \
             -> list:
