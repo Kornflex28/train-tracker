@@ -38,3 +38,21 @@ class DateTime(dt.datetime):
         """
         return dt.datetime.strptime(date, "%Y-%m-%d %H:%M:%S") \
             .strftime("%Y-%m-%dT%H:%M:%S")
+
+    @staticmethod
+    def tdate_to_datetime(tdate: str) -> dt.datetime:
+        """
+        Convert T date string object to date string
+        :param tdate: date string, format: %Y-%m-%dT%H:%M:%S
+        :return: date string, format: %Y-%m-%d %H:%M:%S
+        """
+        return DateTime.strptime(tdate, "%Y-%m-%dT%H:%M:%S")
+
+    @staticmethod
+    def date_to_datetime(tdate: str) -> dt.datetime:
+        """
+        Convert T date string object to date string
+        :param tdate: date string, format: %Y-%m-%dT%H:%M:%S
+        :return: date string, format: %Y-%m-%d %H:%M:%S
+        """
+        return DateTime.strptime(tdate, "%Y-%m-%d %H:%M:%S")

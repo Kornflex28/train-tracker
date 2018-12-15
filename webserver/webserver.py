@@ -102,7 +102,7 @@ class Request(Resource):
         if dbRequest.objects(id=request_id).first() is not None:
             return json.loads(dbRequest.objects(id=request_id).first().to_json()), 200
         else:
-            raise ValueError("404 - Request not found at this id {}".format(request_id))
+            return "Request not found at this id {}".format(request_id), 404
 
     @staticmethod
     def delete(request_id):
@@ -223,7 +223,7 @@ class Station(Resource):
         if dbStation.objects(id=station_id).first() is not None:
             return json.loads(dbStation.objects(id=station_id).first().to_json()), 200
         else:
-            raise ValueError("404 - Station not found at this id {}".format(station_id))
+            return "Station not found at this id {}".format(station_id), 404
 
     @staticmethod
     def delete(station_id):
@@ -326,7 +326,7 @@ class Proposition(Resource):
         if dbProposition.objects(id=proposition_id).first() is not None:
             return json.loads(dbProposition.objects(id=proposition_id).first().to_json()), 200
         else:
-            raise ValueError("404 - Proposition not found at this id {}".format(proposition_id))
+            return "Proposition not found at this id {}".format(proposition_id), 404
 
     @staticmethod
     def delete(proposition_id):
@@ -399,7 +399,7 @@ class TrainRecord(Resource):
         if dbTrainRecord.objects(id=trainrecord_id).first() is not None:
             return json.loads(dbTrainRecord.objects(id=trainrecord_id).first().to_json()), 200
         else:
-            raise ValueError("404 - Train record not found at this id {}".format(trainrecord_id))
+            return "Train record not found at this id {}".format(trainrecord_id), 404
 
     @staticmethod
     def delete(trainrecord_id):

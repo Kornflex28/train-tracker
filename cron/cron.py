@@ -4,7 +4,7 @@ sys.path.append('..')
 import datetime as dt
 
 from database.Request import Request as dbRequest
-from travel import Travel
+from cron.travel import Travel
 from utils.date import DateTime
 
 import utils.credentials
