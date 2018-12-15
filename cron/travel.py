@@ -1,20 +1,69 @@
 from utils.date import DateTime
 import requests
 from database.Station import Station
+from database.TrainRecord import TrainRecord
+from database.Proposition import Proposition
 
 
 class Travel:
 
     url = 'https://www.oui.sncf/proposition/rest/search-travels/outward'
 
-    def __init__(self, date: DateTime, origin_code: str, destination_code: str):
-        self.date = date
+    def __init__(self, departure_date: DateTime, arrival_date: DateTime,origin_code: str, destination_code: str,
+                 duration: int, propositions: list):
+        self.departure_date = departure_date
+        self.arrival_date = arrival_date
         self.origin_code = origin_code
         self.destination_code = destination_code
+        self.duration = duration
+        self.recorded_date = DateTime.now()
+        self.propositions = propositions
 
-    def get(self):
-        Travel.search(self.date, self.origin_code, self.destination_code)
+    def save_to_database(self):
+        list_of_proposition = []
+        for proposition in self.propositions:
+            p = Proposition(amount=proposition['amount'],
+                            remainingSeat=proposition['remaining_seat'])
+            p.save()
+            list_of_proposition.append(p)
 
+        tr = TrainRecord(departureTime=self.departure_date,
+                         arrivalTime=self.arrival_date,
+                         origin=Station.get_station_by_code(self.origin_code),
+                         destination=Station.get_station_by_code(self.destination_code),
+                         duration=self.duration,
+                         recordedTime=self.recorded_date,
+                         propositions=list_of_proposition)
+        tr.save()
+        return tr
+
+    @staticmethod
+    def get_all_travels(date: DateTime, origin_code: str, destination_code: str):
+        current_date = DateTime(date.year, date.month, date.day, 2, 0)
+        dic_of_travels = {}
+        while True:
+            response = Travel.search(current_date, origin_code, destination_code)
+            for resp in response:
+                if not resp['id'] in dic_of_travels:
+                    dic_of_travels[resp['id']] = resp
+
+            if current_date.to_tdate() == response[-1]['departureDate']:
+                break
+            current_date = DateTime.tdate_to_datetime(response[-1]['departureDate'])
+        return [Travel._dic_to_travel(v, origin_code, destination_code) for k, v in dic_of_travels.items()]
+
+    @staticmethod
+    def _dic_to_travel(dic, origin_code, destination_code):
+        propositions = []
+        for proposition in dic['priceProposals']:
+            propositions.append({'amount': proposition['amount'], 'remaining_seat': proposition['remainingSeat']})
+        t = Travel(departure_date=DateTime.tdate_to_datetime(dic['departureDate']),
+                   arrival_date=DateTime.tdate_to_datetime(dic['arrivalDate']),
+                   origin_code=origin_code,
+                   destination_code=destination_code,
+                   duration=dic['minuteDuration'],
+                   propositions=propositions)
+        return t
 
     @staticmethod
     def search(date: DateTime, origin_code: str, destination_code: str) \
