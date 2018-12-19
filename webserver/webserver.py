@@ -381,7 +381,6 @@ class TrainRecords(Resource):
         """
         return json.loads(dbTrainRecord.objects.to_json()), 200
 
-
 api.add_resource(TrainRecords, '/trainrecords')
 
 
