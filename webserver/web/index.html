@@ -3,13 +3,16 @@
     <title>Index</title>
     <meta name="" content="">
     <meta name="Louis Chauvet" content="">
-    <link rel="stylesheet" href="css/styles.css?v=1.0">
 
 </head>
 
 <body>
-    <div id="requests">
-        {{ requests }}
+    <div id="trainrecords">
+        <ul>
+            <li v-for="trainrecord in trainrecords">
+                {{ trainrecord }}
+            </li>
+        </ul>
     </div>
 
 

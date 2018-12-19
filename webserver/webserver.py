@@ -1,11 +1,13 @@
-from flask import Flask, render_template
+from flask import Flask
 from flask_restful import Resource, Api, reqparse
+from flask_cors import  CORS
 import json
 import datetime as dt
 from mongoengine import *
 
 import sys
 sys.path.append('..')
+
 
 from database.Request import Request as dbRequest
 from database.Station import Station as dbStation
@@ -16,7 +18,7 @@ import utils.credentials
 
 app = Flask(__name__)
 api = Api(app)
-
+CORS(app)
 
 # Requests
 # shows a list of requests and lets you POST to add new requests in the database

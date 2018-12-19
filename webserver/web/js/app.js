@@ -1,13 +1,13 @@
-const requests = new Vue({
-    el: '#requests',
+const trainsrecords = new Vue({
+    el: '#trainrecords',
     data: {
-        requests: [],
+        trainrecords: [],
     },
-    mounted() {
-        fetch("localhost:8080/requests")
+    mounted: function() {
+        fetch("http://localhost:8080/trainrecords")
             .then(response => response.json())
             .then((data) => {
-                this.requests = response;
-            })
+                this.trainrecords = data;
+                })
     }
 });
