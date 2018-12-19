@@ -30,7 +30,13 @@ class Requests(Resource):
         Get the list of all the requests registered in the database.
         :return: A list of JSON each containing a request.
         """
-        return json.loads(dbRequest.objects.to_json()), 200
+        requests = json.loads(dbRequest.objects.to_json())
+        #print(json)
+        for request in requests :
+            #request['date'] = str(dt.datetime.fromtimestamp((request['date']['$date'])))
+            request['destination'] = dbStation.objects(id=request['destination']['$oid']).first().name
+            request['origin'] = dbStation.objects(id=request['origin']['$oid']).first().name
+        return requests, 200
 
     @staticmethod
     def post():
@@ -84,7 +90,12 @@ class Requests(Resource):
                                 date=dt.datetime.strptime(requests_args['date'], "%Y-%m-%d %H:%M:%S"),
                                 gapTime=requests_args['gapTime'])
             request.save()
-            return json.loads(request.to_json()), 201
+
+            request = json.loads(request.to_json())
+            request['date'] = requests_args['date']
+            request['destination'] = destination_station.name
+            request['origin'] = origin_station.name
+            return request, 201
 
 
 api.add_resource(Requests, '/requests')
