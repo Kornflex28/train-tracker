@@ -415,17 +415,6 @@ class TrainRecord(Resource):
 api.add_resource(TrainRecord, '/trainrecords/<string:trainrecord_id>')
 
 
-@app.route("/")
-@app.route("/home")
-def home():
-    return render_template("home.html", title="Home")
-
-
-@app.route("/about")
-def about():
-    return render_template("about.html", title="About")
-
-
 if __name__ == '__main__':
     app.run(port='8080', debug=True)
 
