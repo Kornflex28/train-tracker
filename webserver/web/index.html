@@ -10,7 +10,16 @@
     <div id="trainrecords">
         <ul>
             <li v-for="trainrecord in trainrecords">
-                {{ trainrecord }}
+                De <strong>{{ trainrecord['origin'] }}</strong> à <strong>{{ trainrecord['destination'] }}</strong> le
+                <strong>{{ trainrecord['departureTime'] }}</strong> il reste au jour du
+                <strong>{{ trainrecord['recordedTime'] }}</strong>
+                <ul>
+                    <li v-for="proposition in trainrecord['propositions']">
+                        <strong>{{ proposition[1] }}</strong> places à <strong>{{proposition[0]}}</strong> €
+                    </li>
+                </ul>
+
+
             </li>
         </ul>
     </div>

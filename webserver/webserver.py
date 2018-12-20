@@ -416,6 +416,7 @@ class TrainRecords(Resource):
             trainrecords[k]['origin'] = db_trainrecords[k]['origin'].name
         return trainrecords, 200
 
+
 api.add_resource(TrainRecords, '/trainrecords')
 
 
