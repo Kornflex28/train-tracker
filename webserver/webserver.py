@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
-from flask_cors import  CORS
+from flask_cors import CORS
 import json
 import datetime as dt
 from mongoengine import *
@@ -20,6 +20,7 @@ app = Flask(__name__)
 api = Api(app)
 CORS(app)
 
+
 # Requests
 # shows a list of requests and lets you POST to add new requests in the database
 class Requests(Resource):
@@ -30,12 +31,12 @@ class Requests(Resource):
         Get the list of all the requests registered in the database.
         :return: A list of JSON each containing a request.
         """
-        requests = json.loads(dbRequest.objects.to_json())
-        #print(json)
-        for request in requests :
-            #request['date'] = str(dt.datetime.fromtimestamp((request['date']['$date'])))
-            request['destination'] = dbStation.objects(id=request['destination']['$oid']).first().name
-            request['origin'] = dbStation.objects(id=request['origin']['$oid']).first().name
+        db_requests = dbRequest.objects
+        requests = json.loads(db_requests.to_json())
+        for k in range(len(requests)):
+            requests[k]['date'] = str((db_requests[k]['date']))
+            requests[k]['destination'] = db_requests[k]['destination'].name
+            requests[k]['origin'] = db_requests[k]['origin'].name
         return requests, 200
 
     @staticmethod
@@ -113,7 +114,12 @@ class Request(Resource):
         :return: A JSON file of the request.
         """
         if dbRequest.objects(id=request_id).first() is not None:
-            return json.loads(dbRequest.objects(id=request_id).first().to_json()), 200
+            db_request = dbRequest.objects(id=request_id).first()
+            request = json.loads(db_request.to_json())
+            request['date'] = str((db_request['date']))
+            request['destination'] = db_request['destination'].name
+            request['origin'] = db_request['origin'].name
+            return request, 200
         else:
             return "Request not found at this id {}".format(request_id), 404
 
@@ -174,7 +180,13 @@ class Request(Resource):
                                                     set__date=dt.datetime.strptime(request_args['date'],
                                                                                    "%Y-%m-%d %H:%M:%S"),
                                                     set__gapTime=request_args['gapTime'])
-        return json.loads(dbRequest.objects(id=request_id).first().to_json()), 200
+
+        db_request = dbRequest.objects(id=request_id).first()
+        request = json.loads(db_request.to_json())
+        request['date'] = str((db_request['date']))
+        request['destination'] = db_request['destination'].name
+        request['origin'] = db_request['origin'].name
+        return request, 200
 
 
 api.add_resource(Request, '/requests/<string:request_id>')
@@ -392,7 +404,17 @@ class TrainRecords(Resource):
         Get the list of all the train records registered in the database.
         :return: A list of JSON each containing a train record.
         """
-        return json.loads(dbTrainRecord.objects.to_json()), 200
+        db_trainrecords = dbTrainRecord.objects
+        trainrecords = json.loads(db_trainrecords.to_json())
+        for k in range(len(trainrecords)):
+            trainrecords[k]['recordedTime'] = str((db_trainrecords[k]['recordedTime']))
+            trainrecords[k]['arrivalTime'] = str((db_trainrecords[k]['arrivalTime']))
+            trainrecords[k]['departureTime'] = str((db_trainrecords[k]['departureTime']))
+            trainrecords[k]['propositions'] = [(db_proposition.amount,db_proposition.remainingSeat) for db_proposition
+                                               in db_trainrecords[k]['propositions']]
+            trainrecords[k]['destination'] = db_trainrecords[k]['destination'].name
+            trainrecords[k]['origin'] = db_trainrecords[k]['origin'].name
+        return trainrecords, 200
 
 api.add_resource(TrainRecords, '/trainrecords')
 
@@ -409,7 +431,16 @@ class TrainRecord(Resource):
         :return: A JSON file of the train record.
         """
         if dbTrainRecord.objects(id=trainrecord_id).first() is not None:
-            return json.loads(dbTrainRecord.objects(id=trainrecord_id).first().to_json()), 200
+            db_trainrecord = dbTrainRecord.objects(id=trainrecord_id).first()
+            trainrecord = json.loads(db_trainrecord.to_json())
+            trainrecord['recordedTime'] = str((db_trainrecord['recordedTime']))
+            trainrecord['arrivalTime'] = str((db_trainrecord['arrivalTime']))
+            trainrecord['departureTime'] = str((db_trainrecord['departureTime']))
+            trainrecord['propositions'] = [(db_proposition.amount, db_proposition.remainingSeat) for db_proposition
+                                           in db_trainrecord['propositions']]
+            trainrecord['destination'] = db_trainrecord['destination'].name
+            trainrecord['origin'] = db_trainrecord['origin'].name
+            return trainrecord, 200
         else:
             return "Train record not found at this id {}".format(trainrecord_id), 404
 
