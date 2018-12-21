@@ -1,11 +1,13 @@
-from flask import Flask, render_template
+from flask import Flask
 from flask_restful import Resource, Api, reqparse
+from flask_cors import CORS
 import json
 import datetime as dt
 from mongoengine import *
 
 import sys
 sys.path.append('..')
+
 
 from database.Request import Request as dbRequest
 from database.Station import Station as dbStation
@@ -16,6 +18,7 @@ import utils.credentials
 
 app = Flask(__name__)
 api = Api(app)
+CORS(app)
 
 
 # Requests
@@ -28,7 +31,13 @@ class Requests(Resource):
         Get the list of all the requests registered in the database.
         :return: A list of JSON each containing a request.
         """
-        return json.loads(dbRequest.objects.to_json()), 200
+        db_requests = dbRequest.objects
+        requests = json.loads(db_requests.to_json())
+        for k in range(len(requests)):
+            requests[k]['date'] = str((db_requests[k]['date']))
+            requests[k]['destination'] = db_requests[k]['destination'].name
+            requests[k]['origin'] = db_requests[k]['origin'].name
+        return requests, 200
 
     @staticmethod
     def post():
@@ -82,7 +91,12 @@ class Requests(Resource):
                                 date=dt.datetime.strptime(requests_args['date'], "%Y-%m-%d %H:%M:%S"),
                                 gapTime=requests_args['gapTime'])
             request.save()
-            return json.loads(request.to_json()), 201
+
+            request = json.loads(request.to_json())
+            request['date'] = requests_args['date']
+            request['destination'] = destination_station.name
+            request['origin'] = origin_station.name
+            return request, 201
 
 
 api.add_resource(Requests, '/requests')
@@ -100,7 +114,12 @@ class Request(Resource):
         :return: A JSON file of the request.
         """
         if dbRequest.objects(id=request_id).first() is not None:
-            return json.loads(dbRequest.objects(id=request_id).first().to_json()), 200
+            db_request = dbRequest.objects(id=request_id).first()
+            request = json.loads(db_request.to_json())
+            request['date'] = str((db_request['date']))
+            request['destination'] = db_request['destination'].name
+            request['origin'] = db_request['origin'].name
+            return request, 200
         else:
             return "Request not found at this id {}".format(request_id), 404
 
@@ -161,7 +180,13 @@ class Request(Resource):
                                                     set__date=dt.datetime.strptime(request_args['date'],
                                                                                    "%Y-%m-%d %H:%M:%S"),
                                                     set__gapTime=request_args['gapTime'])
-        return json.loads(dbRequest.objects(id=request_id).first().to_json()), 200
+
+        db_request = dbRequest.objects(id=request_id).first()
+        request = json.loads(db_request.to_json())
+        request['date'] = str((db_request['date']))
+        request['destination'] = db_request['destination'].name
+        request['origin'] = db_request['origin'].name
+        return request, 200
 
 
 api.add_resource(Request, '/requests/<string:request_id>')
@@ -276,37 +301,37 @@ class Propositions(Resource):
         """
         return json.loads(dbProposition.objects.to_json()), 200
 
-    @staticmethod
-    def post():
-        """
-        Add a NEW proposition that will be registered in the database.
-        :param: Arguments of the POST request.
-                amount: Price of the proposition - Required
-                remainingSeat: Number of remaining seats for the proposition - Required
-        :return: A JSON file of the proposition newly registered.
-        """
+    # @staticmethod
+    # def post():
+    #     """
+    #     Add a NEW proposition that will be registered in the database.
+    #     :param: Arguments of the POST request.
+    #             amount: Price of the proposition - Required
+    #             remainingSeat: Number of remaining seats for the proposition - Required
+    #     :return: A JSON file of the proposition newly registered.
+    #     """
 
-        # propositions parser
-        propositions_parser = reqparse.RequestParser()
-        propositions_parser.add_argument(name='amount', type=int, required=True, help="The  price of the proposition")
-        propositions_parser.add_argument(name='remainingSeat', type=float, required=True,
-                                         help="The  number of remaining seats for the proposition")
-        propositions_args = propositions_parser.parse_args()
+    #     # propositions parser
+    #     propositions_parser = reqparse.RequestParser()
+    #     propositions_parser.add_argument(name='amount', type=int, required=True, help="The  price of the proposition")
+    #     propositions_parser.add_argument(name='remainingSeat', type=float, required=True,
+    #                                      help="The  number of remaining seats for the proposition")
+    #     propositions_args = propositions_parser.parse_args()
 
-        # checks if the proposition already exists in the database
-        proposition_exist = dbProposition.objects(amount=propositions_args['amount'],
-                                                  remainingSeat=propositions_args['remainingSeat']).first() is not None
-        print(proposition_exist, dbProposition.objects(amount=propositions_args['amount'],
-                                                       remainingSeat=propositions_args['remainingSeat']))
-        if proposition_exist:
-            proposition_id = dbProposition.objects(amount=propositions_args['amount'],
-                                                   remainingSeat=propositions_args['remainingSeat']).first().id
-            return "The proposition already exists at id {}".format(proposition_id), 208
-        else:
-            proposition = dbProposition(amount=propositions_args['amount'],
-                                        remainingSeat=propositions_args['remainingSeat'])
-            proposition.save()
-            return json.loads(proposition.to_json()), 201
+    #     # checks if the proposition already exists in the database
+    #     proposition_exist = dbProposition.objects(amount=propositions_args['amount'],
+    #                                               remainingSeat=propositions_args['remainingSeat']).first() is not None
+    #     print(proposition_exist, dbProposition.objects(amount=propositions_args['amount'],
+    #                                                    remainingSeat=propositions_args['remainingSeat']))
+    #     if proposition_exist:
+    #         proposition_id = dbProposition.objects(amount=propositions_args['amount'],
+    #                                                remainingSeat=propositions_args['remainingSeat']).first().id
+    #         return "The proposition already exists at id {}".format(proposition_id), 208
+    #     else:
+    #         proposition = dbProposition(amount=propositions_args['amount'],
+    #                                     remainingSeat=propositions_args['remainingSeat'])
+    #         proposition.save()
+    #         return json.loads(proposition.to_json()), 201
 
 
 api.add_resource(Propositions, '/propositions')
@@ -337,34 +362,34 @@ class Proposition(Resource):
         """
         dbProposition.objects(id=proposition_id).delete()
         return "", 204
+    
+    # @staticmethod
+    # def put(proposition_id):
+    #     """
+    #     Update a proposition that is registered in the database.
+    #     :param: amount: Price of the proposition - Default is the proposition's one
+    #             remainingSeat: Number of remaining seats for the proposition - Default is the proposition's one
+    #     :return: A JSON file of the proposition newly updated.
+    #     """
 
-    @staticmethod
-    def put(proposition_id):
-        """
-        Update a proposition that is registered in the database.
-        :param: amount: Price of the proposition - Default is the proposition's one
-                remainingSeat: Number of remaining seats for the proposition - Default is the proposition's one
-        :return: A JSON file of the proposition newly updated.
-        """
+    #     # proposition parser
+    #     proposition_parser = reqparse.RequestParser()
+    #     proposition_parser.add_argument(name='amount', type=int, help="The  price of the proposition")
+    #     proposition_parser.add_argument(name='remainingSeat', type=float,
+    #                                     help="The  number of remaining seats for the proposition")
+    #     proposition_args = proposition_parser.parse_args()
 
-        # proposition parser
-        proposition_parser = reqparse.RequestParser()
-        proposition_parser.add_argument(name='amount', type=int, help="The  price of the proposition")
-        proposition_parser.add_argument(name='remainingSeat', type=float,
-                                        help="The  number of remaining seats for the proposition")
-        proposition_args = proposition_parser.parse_args()
+    #     proposition = dbProposition.objects(id=proposition_id).first()
 
-        proposition = dbProposition.objects(id=proposition_id).first()
+    #     # get default values
+    #     if proposition_args['amount'] is None:
+    #         proposition_args['amount'] = proposition.amount
+    #     if proposition_args['remainingSeat'] is None:
+    #         proposition_args['remainingSeat'] = proposition.remainingSeat
 
-        # get default values
-        if proposition_args['amount'] is None:
-            proposition_args['amount'] = proposition.amount
-        if proposition_args['remainingSeat'] is None:
-            proposition_args['remainingSeat'] = proposition.remainingSeat
-
-        dbProposition.objects(id=proposition_id).update_one(set__amount=proposition_args['amount'],
-                                                            set__remainingSeat=proposition_args['remainingSeat'])
-        return json.loads(dbProposition.objects(id=proposition_id).first().to_json()), 200
+    #     dbProposition.objects(id=proposition_id).update_one(set__amount=proposition_args['amount'],
+    #                                                         set__remainingSeat=proposition_args['remainingSeat'])
+    #     return json.loads(dbProposition.objects(id=proposition_id).first().to_json()), 200
 
 
 api.add_resource(Proposition, '/propositions/<string:proposition_id>')
@@ -379,7 +404,17 @@ class TrainRecords(Resource):
         Get the list of all the train records registered in the database.
         :return: A list of JSON each containing a train record.
         """
-        return json.loads(dbTrainRecord.objects.to_json()), 200
+        db_trainrecords = dbTrainRecord.objects
+        trainrecords = json.loads(db_trainrecords.to_json())
+        for k in range(len(trainrecords)):
+            trainrecords[k]['recordedTime'] = str((db_trainrecords[k]['recordedTime']))
+            trainrecords[k]['arrivalTime'] = str((db_trainrecords[k]['arrivalTime']))
+            trainrecords[k]['departureTime'] = str((db_trainrecords[k]['departureTime']))
+            trainrecords[k]['propositions'] = [{'type': db_proposition.type, 'amount': db_proposition.amount, 'seats': db_proposition.remainingSeat} for db_proposition
+                                               in db_trainrecords[k]['propositions']]
+            trainrecords[k]['destination'] = db_trainrecords[k]['destination'].name
+            trainrecords[k]['origin'] = db_trainrecords[k]['origin'].name
+        return trainrecords, 200
 
 
 api.add_resource(TrainRecords, '/trainrecords')
@@ -397,7 +432,16 @@ class TrainRecord(Resource):
         :return: A JSON file of the train record.
         """
         if dbTrainRecord.objects(id=trainrecord_id).first() is not None:
-            return json.loads(dbTrainRecord.objects(id=trainrecord_id).first().to_json()), 200
+            db_trainrecord = dbTrainRecord.objects(id=trainrecord_id).first()
+            trainrecord = json.loads(db_trainrecord.to_json())
+            trainrecord['recordedTime'] = str((db_trainrecord['recordedTime']))
+            trainrecord['arrivalTime'] = str((db_trainrecord['arrivalTime']))
+            trainrecord['departureTime'] = str((db_trainrecord['departureTime']))
+            trainrecord['propositions'] = [{'type': db_proposition.type, 'amount': db_proposition.amount, 'seats': db_proposition.remainingSeat} for db_proposition
+                                           in db_trainrecord['propositions']]
+            trainrecord['destination'] = db_trainrecord['destination'].name
+            trainrecord['origin'] = db_trainrecord['origin'].name
+            return trainrecord, 200
         else:
             return "Train record not found at this id {}".format(trainrecord_id), 404
 

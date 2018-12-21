@@ -22,7 +22,8 @@ class Travel:
     def save_to_database(self):
         list_of_proposition = []
         for proposition in self.propositions:
-            p = Proposition(amount=proposition['amount'],
+            p = Proposition(type=proposition['type'],
+                            amount=proposition['amount'],
                             remainingSeat=proposition['remaining_seat'])
             p.save()
             list_of_proposition.append(p)
@@ -46,7 +47,7 @@ class Travel:
             for resp in response:
                 if not resp['id'] in dic_of_travels:
                     dic_of_travels[resp['id']] = resp
-
+            
             if current_date.to_tdate() == response[-1]['departureDate']:
                 break
             current_date = DateTime.tdate_to_datetime(response[-1]['departureDate'])
@@ -56,11 +57,11 @@ class Travel:
     def _dic_to_travel(dic, origin_code, destination_code):
         propositions = []
         for proposition in dic['priceProposals']:
-            propositions.append({'amount': proposition['amount'], 'remaining_seat': proposition['remainingSeat']})
+            propositions.append({'type': proposition['type'], 'amount': proposition['amount'], 'remaining_seat': proposition['remainingSeat']})
         t = Travel(departure_date=DateTime.tdate_to_datetime(dic['departureDate']),
                    arrival_date=DateTime.tdate_to_datetime(dic['arrivalDate']),
-                   origin_code=origin_code,
-                   destination_code=destination_code,
+                   origin_code=dic['originStationCode'],
+                   destination_code=dic['destinationStationCode'],
                    duration=dic['minuteDuration'],
                    propositions=propositions)
         return t
