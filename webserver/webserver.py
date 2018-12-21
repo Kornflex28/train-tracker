@@ -301,37 +301,37 @@ class Propositions(Resource):
         """
         return json.loads(dbProposition.objects.to_json()), 200
 
-    @staticmethod
-    def post():
-        """
-        Add a NEW proposition that will be registered in the database.
-        :param: Arguments of the POST request.
-                amount: Price of the proposition - Required
-                remainingSeat: Number of remaining seats for the proposition - Required
-        :return: A JSON file of the proposition newly registered.
-        """
+    # @staticmethod
+    # def post():
+    #     """
+    #     Add a NEW proposition that will be registered in the database.
+    #     :param: Arguments of the POST request.
+    #             amount: Price of the proposition - Required
+    #             remainingSeat: Number of remaining seats for the proposition - Required
+    #     :return: A JSON file of the proposition newly registered.
+    #     """
 
-        # propositions parser
-        propositions_parser = reqparse.RequestParser()
-        propositions_parser.add_argument(name='amount', type=int, required=True, help="The  price of the proposition")
-        propositions_parser.add_argument(name='remainingSeat', type=float, required=True,
-                                         help="The  number of remaining seats for the proposition")
-        propositions_args = propositions_parser.parse_args()
+    #     # propositions parser
+    #     propositions_parser = reqparse.RequestParser()
+    #     propositions_parser.add_argument(name='amount', type=int, required=True, help="The  price of the proposition")
+    #     propositions_parser.add_argument(name='remainingSeat', type=float, required=True,
+    #                                      help="The  number of remaining seats for the proposition")
+    #     propositions_args = propositions_parser.parse_args()
 
-        # checks if the proposition already exists in the database
-        proposition_exist = dbProposition.objects(amount=propositions_args['amount'],
-                                                  remainingSeat=propositions_args['remainingSeat']).first() is not None
-        print(proposition_exist, dbProposition.objects(amount=propositions_args['amount'],
-                                                       remainingSeat=propositions_args['remainingSeat']))
-        if proposition_exist:
-            proposition_id = dbProposition.objects(amount=propositions_args['amount'],
-                                                   remainingSeat=propositions_args['remainingSeat']).first().id
-            return "The proposition already exists at id {}".format(proposition_id), 208
-        else:
-            proposition = dbProposition(amount=propositions_args['amount'],
-                                        remainingSeat=propositions_args['remainingSeat'])
-            proposition.save()
-            return json.loads(proposition.to_json()), 201
+    #     # checks if the proposition already exists in the database
+    #     proposition_exist = dbProposition.objects(amount=propositions_args['amount'],
+    #                                               remainingSeat=propositions_args['remainingSeat']).first() is not None
+    #     print(proposition_exist, dbProposition.objects(amount=propositions_args['amount'],
+    #                                                    remainingSeat=propositions_args['remainingSeat']))
+    #     if proposition_exist:
+    #         proposition_id = dbProposition.objects(amount=propositions_args['amount'],
+    #                                                remainingSeat=propositions_args['remainingSeat']).first().id
+    #         return "The proposition already exists at id {}".format(proposition_id), 208
+    #     else:
+    #         proposition = dbProposition(amount=propositions_args['amount'],
+    #                                     remainingSeat=propositions_args['remainingSeat'])
+    #         proposition.save()
+    #         return json.loads(proposition.to_json()), 201
 
 
 api.add_resource(Propositions, '/propositions')
@@ -362,34 +362,34 @@ class Proposition(Resource):
         """
         dbProposition.objects(id=proposition_id).delete()
         return "", 204
+    
+    # @staticmethod
+    # def put(proposition_id):
+    #     """
+    #     Update a proposition that is registered in the database.
+    #     :param: amount: Price of the proposition - Default is the proposition's one
+    #             remainingSeat: Number of remaining seats for the proposition - Default is the proposition's one
+    #     :return: A JSON file of the proposition newly updated.
+    #     """
 
-    @staticmethod
-    def put(proposition_id):
-        """
-        Update a proposition that is registered in the database.
-        :param: amount: Price of the proposition - Default is the proposition's one
-                remainingSeat: Number of remaining seats for the proposition - Default is the proposition's one
-        :return: A JSON file of the proposition newly updated.
-        """
+    #     # proposition parser
+    #     proposition_parser = reqparse.RequestParser()
+    #     proposition_parser.add_argument(name='amount', type=int, help="The  price of the proposition")
+    #     proposition_parser.add_argument(name='remainingSeat', type=float,
+    #                                     help="The  number of remaining seats for the proposition")
+    #     proposition_args = proposition_parser.parse_args()
 
-        # proposition parser
-        proposition_parser = reqparse.RequestParser()
-        proposition_parser.add_argument(name='amount', type=int, help="The  price of the proposition")
-        proposition_parser.add_argument(name='remainingSeat', type=float,
-                                        help="The  number of remaining seats for the proposition")
-        proposition_args = proposition_parser.parse_args()
+    #     proposition = dbProposition.objects(id=proposition_id).first()
 
-        proposition = dbProposition.objects(id=proposition_id).first()
+    #     # get default values
+    #     if proposition_args['amount'] is None:
+    #         proposition_args['amount'] = proposition.amount
+    #     if proposition_args['remainingSeat'] is None:
+    #         proposition_args['remainingSeat'] = proposition.remainingSeat
 
-        # get default values
-        if proposition_args['amount'] is None:
-            proposition_args['amount'] = proposition.amount
-        if proposition_args['remainingSeat'] is None:
-            proposition_args['remainingSeat'] = proposition.remainingSeat
-
-        dbProposition.objects(id=proposition_id).update_one(set__amount=proposition_args['amount'],
-                                                            set__remainingSeat=proposition_args['remainingSeat'])
-        return json.loads(dbProposition.objects(id=proposition_id).first().to_json()), 200
+    #     dbProposition.objects(id=proposition_id).update_one(set__amount=proposition_args['amount'],
+    #                                                         set__remainingSeat=proposition_args['remainingSeat'])
+    #     return json.loads(dbProposition.objects(id=proposition_id).first().to_json()), 200
 
 
 api.add_resource(Proposition, '/propositions/<string:proposition_id>')
@@ -410,7 +410,7 @@ class TrainRecords(Resource):
             trainrecords[k]['recordedTime'] = str((db_trainrecords[k]['recordedTime']))
             trainrecords[k]['arrivalTime'] = str((db_trainrecords[k]['arrivalTime']))
             trainrecords[k]['departureTime'] = str((db_trainrecords[k]['departureTime']))
-            trainrecords[k]['propositions'] = [(db_proposition.amount,db_proposition.remainingSeat) for db_proposition
+            trainrecords[k]['propositions'] = [{'type': db_proposition.type, 'amount': db_proposition.amount, 'seats': db_proposition.remainingSeat} for db_proposition
                                                in db_trainrecords[k]['propositions']]
             trainrecords[k]['destination'] = db_trainrecords[k]['destination'].name
             trainrecords[k]['origin'] = db_trainrecords[k]['origin'].name
@@ -437,7 +437,7 @@ class TrainRecord(Resource):
             trainrecord['recordedTime'] = str((db_trainrecord['recordedTime']))
             trainrecord['arrivalTime'] = str((db_trainrecord['arrivalTime']))
             trainrecord['departureTime'] = str((db_trainrecord['departureTime']))
-            trainrecord['propositions'] = [(db_proposition.amount, db_proposition.remainingSeat) for db_proposition
+            trainrecord['propositions'] = [{'type': db_proposition.type, 'amount': db_proposition.amount, 'seats': db_proposition.remainingSeat} for db_proposition
                                            in db_trainrecord['propositions']]
             trainrecord['destination'] = db_trainrecord['destination'].name
             trainrecord['origin'] = db_trainrecord['origin'].name

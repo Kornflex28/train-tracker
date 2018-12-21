@@ -31,7 +31,7 @@
                     </ul>
             </nav>
             <div class="col md-9 ml-sm-auto" id="trainrecords" role="main">
-                <h2>Train Records</h2>
+                <h2>Train Records ({{trainrecords.length}})</h2> 
                 <ul>
                     <li v-for="trainrecord in trainrecords">
                         De <strong>{{ trainrecord['origin'] }}</strong> à <strong>{{ trainrecord['destination'] }}</strong>
@@ -40,8 +40,8 @@
                         <strong>{{ trainrecord['recordedTime'] }}</strong>
                         <ul>
                             <li v-for="proposition in trainrecord['propositions']">
-                                <strong>{{ proposition[1] }}</strong> places à <strong>{{proposition[0]}}</strong>
-                                €
+                                <strong>{{ proposition['seats'] }}</strong> places à <strong>{{proposition['amount']}}€</strong> en <strong>{{proposition['type']}}</strong>
+                                
                             </li>
                         </ul>
 
