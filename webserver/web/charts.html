@@ -19,12 +19,12 @@
                 <div class="sidebar-sticky">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link active" href="index.html">
+                            <a class="nav-link" href="index.html">
                                 Index
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="charts.html">
+                            <a class="nav-link active" href="charts.html">
                                 Charts
                             </a>
                         </li>
@@ -36,30 +36,6 @@
                     </ul>
             </nav>
             <div class="col md-9 ml-sm-auto" id="trainrecords" role="main">
-                <div class="alert alert-info" v-show="loading">
-                    Loading...
-                </div>
-                <h2>Tests</h2>
-                <div v-show="chart != null">
-                    <canvas id="myChart"></canvas>
-                </div>
-                <h2>Train Records ({{trainrecords.length}})</h2>
-                <ul>
-                    <li v-for="trainrecord in trainrecords">
-                        De <strong>{{ trainrecord.origin }}</strong> à <strong>{{ trainrecord.destination }}</strong>
-                        le <strong>{{ trainrecord.departureTime }}</strong> il reste au jour du
-                        <strong>{{ trainrecord.recordedTime }}</strong>
-                        <ul>
-                            <li v-for="(proposition,type) in trainrecord['propositions']">
-                                <strong>{{ proposition.seats }}</strong> places à <strong>{{proposition.amount}}€</strong>
-                                en <strong>{{type}}</strong>
-
-                            </li>
-                        </ul>
-
-
-                    </li>
-                </ul>
             </div>
         </div>
     </div>
@@ -70,7 +46,9 @@
         crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
         crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+    <script src="https://unpkg.com/vue-chartjs/dist/vue-chartjs.min.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.21/dist/vue.js"></script>
     <script src="js/app.js"></script>
 </body>
