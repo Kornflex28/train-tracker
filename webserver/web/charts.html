@@ -11,11 +11,11 @@
 
 <body>
     <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="index.html">train-tracker</a>
+        <a class="navbar-brand col-1 mr-0" href="index.html">train-tracker</a>
     </nav>
     <div class="container">
-        <div class="row">
-            <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+        <div class="row ">
+            <nav class="col-1 bg-light sidebar">
                 <div class="sidebar-sticky">
                     <ul class="nav flex-column">
                         <li class="nav-item">
@@ -35,13 +35,14 @@
                         </li>
                     </ul>
             </nav>
-            <div class="col-md-9 ml-sm-auto" id="trainrecords" role="main">
+            <div class="col" id="trainrecords" role="main">
                 <div class="alert alert-info" v-show="loading">
                     Loading...
                 </div>
                 <h2>Charts</h2>
-                <div v-show="charts != []" v-for="chart in chartsName">
-                    <canvas :id=chart></canvas>
+                <div class="row" v-show="charts != []" v-for="chart in chartsName">
+                    <div class="col"><canvas :id=chart></canvas></div>
+                    <div class="col"><canvas :id=chart+"P"></canvas></div>
                 </div>
             </div>
         </div>

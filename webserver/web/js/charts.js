@@ -42,18 +42,20 @@ const trainrecords = new Vue({
                 })
                 .then((trains) => {
                     for (var train in trains) {
-                        dataSets = [];
+                        datasetsSeats = [];
+                        datasetsPrice = [];
                         var dates = trains[train]['recordedTime'];
                         var seats = {};
                         var prices = {};
 
                         for (i = 0; i < trains[train]['propositions'].length; i++) {
                             for (proposition in trains[train]['propositions'][i]) {
-                                if (!i) {
+                                if (!Object.keys(seats).includes(proposition)) {
                                     seats[proposition] = [(trains[train]['propositions'][i][proposition]['seats'])];
                                     prices[proposition] = [(trains[train]['propositions'][i][proposition]['amount'])];
                                 }
                                 else {
+                                    //console.log(train,proposition,seats)
                                     seats[proposition].push((trains[train]['propositions'][i][proposition]['seats']));
                                     prices[proposition].push((trains[train]['propositions'][i][proposition]['amount']));
                                 }
@@ -64,7 +66,7 @@ const trainrecords = new Vue({
                         var k = 0
                         for (proposition in seats) {
                             var col = 255 * (k / Object.keys(seats).length);
-                            dataSets.push({
+                            datasetsSeats.push({
                                 label: proposition,
                                 fill: false,
                                 data: seats[proposition],
@@ -72,24 +74,30 @@ const trainrecords = new Vue({
                                 borderColor: "rgba(255," + col + ",0, 0.5)",
                                 yAxisID: 'y-axis-1'
                             });
-                            // dataSets.push({
-                            //     label: "Prices " + proposition,
-                            //     fill: false,
-                            //     data: prices[proposition],
-                            //     backgroundColor: "rgba(255,0," + col + ", 0.5)",
-                            //     borderColor: "rgba(255,0," + col + ", 0.5)",
-                            //     yAxisID: 'y-axis-2'
-                            // });
+                            k += 1;
+                        }
+                        k = 0;
+                        for (proposition in prices) {
+                            var col = 255 * (k / Object.keys(seats).length);
+                            datasetsPrice.push({
+                                label: proposition,
+                                fill: false,
+                                data: prices[proposition],
+                                backgroundColor: "rgba(0,"+col+", 255, 0.5)",
+                                borderColor: "rgba(0,"+col+", 255, 0.5)",
+                                yAxisID: 'y-axis-1'
+                            });
                             k += 1;
                         }
                         spTrain = train.split("_");
-                        var title = "De " + spTrain[0] + " à " + spTrain[2] + " le " + spTrain[1];
-                        var ctx = document.getElementById(train);
-                        this.charts.push(new Chart(ctx, {
+                        console.log(train, datasetsPrice, datasetsSeats);
+                        var title = "De " + spTrain[0].split("(")[0] + "à " + spTrain[2].split("(")[0] + "le " + spTrain[1];
+                        var ctxS = document.getElementById(train);
+                        this.charts.push(new Chart(ctxS, {
                             type: "line",
                             data: {
                                 labels: dates,
-                                datasets: dataSets
+                                datasets: datasetsSeats
                             },
                             options: {
                                 title: {
@@ -108,18 +116,53 @@ const trainrecords = new Vue({
                                             display: true,
                                             labelString: "Remaining seats"
                                         }
-                                    }
-                                    //     , {
-                                    //     type: 'linear',
-                                    //     display: true,
-                                    //     position: 'right',
-                                    //     id: 'y-axis-2',
-                                    //     scaleLabel: {
-                                    //         display: true,
-                                    //         labelString: "Prices (€)"
-                                    //     }
-                                    // }
-                                    ]
+                                    }]
+                                },
+
+                                tooltips: {
+                                    mode: "index",
+                                    intersect: true,
+                                },
+                                hover: {
+                                    mode: "index",
+                                    intersect: true
+                                },
+                            }
+                        }));
+
+                        var ctxP = document.getElementById(train + "P");
+                        this.charts.push(new Chart(ctxP, {
+                            type: "line",
+                            data: {
+                                labels: dates,
+                                datasets: datasetsPrice
+                            },
+                            options: {
+                                title: {
+                                    display: true,
+                                    text: title,
+                                    fontSize: 14,
+                                },
+
+                                scales: {
+                                    yAxes: [{
+                                        type: 'linear',
+                                        display: true,
+                                        position: 'left',
+                                        id: 'y-axis-1',
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: "Price (€)"
+                                        }
+                                    }]
+                                },
+                                tooltips: {
+                                    mode: "index",
+                                    intersect: true,
+                                },
+                                hover: {
+                                    mode: "index",
+                                    intersect: true
                                 },
                             }
                         }));
