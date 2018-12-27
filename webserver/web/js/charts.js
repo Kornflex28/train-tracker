@@ -166,10 +166,6 @@ const trainrecords = new Vue({
                             }
                         }));
                     }
-                    var graphs = document.getElementsByTagName('canvas');
-                    for (i = 0; i < graphs.length; i++) {
-                        console.log(graphs[i].textContent, graphs[i].innerText);
-                    }
                 })
                 .finally(() => (this.loading = false));
         },
@@ -178,8 +174,6 @@ const trainrecords = new Vue({
             var input = document.getElementById('searchbar');
             var filter = input.value.toUpperCase();
             var graphs = document.getElementsByTagName('canvas');
-            console.log(filter);
-            console.log(graphs);
             for (i = 0; i < graphs.length; i++) {
                 var graph_id = graphs[i].id;
                 if (graph_id.toUpperCase().indexOf(filter) > -1) {
