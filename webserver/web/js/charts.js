@@ -72,7 +72,7 @@ const trainrecords = new Vue({
                                 data: seats[proposition],
                                 backgroundColor: "rgba(255," + col + ",0, 0.5)",
                                 borderColor: "rgba(255," + col + ",0, 0.5)",
-                                yAxisID: 'y-axis-1'
+                                yAxisID: 'y-axis-1',
                             });
                             k += 1;
                         }
@@ -83,21 +83,20 @@ const trainrecords = new Vue({
                                 label: proposition,
                                 fill: false,
                                 data: prices[proposition],
-                                backgroundColor: "rgba(0,"+col+", 255, 0.5)",
-                                borderColor: "rgba(0,"+col+", 255, 0.5)",
-                                yAxisID: 'y-axis-1'
+                                backgroundColor: "rgba(0," + col + ", 255, 0.5)",
+                                borderColor: "rgba(0," + col + ", 255, 0.5)",
+                                yAxisID: 'y-axis-1',
                             });
                             k += 1;
                         }
                         spTrain = train.split("_");
-                        console.log(train, datasetsPrice, datasetsSeats);
                         var title = "De " + spTrain[0].split("(")[0] + "à " + spTrain[2].split("(")[0] + "le " + spTrain[1];
                         var ctxS = document.getElementById(train);
                         this.charts.push(new Chart(ctxS, {
                             type: "line",
                             data: {
                                 labels: dates,
-                                datasets: datasetsSeats
+                                datasets: datasetsSeats,
                             },
                             options: {
                                 title: {
@@ -114,7 +113,7 @@ const trainrecords = new Vue({
                                         id: 'y-axis-1',
                                         scaleLabel: {
                                             display: true,
-                                            labelString: "Remaining seats"
+                                            labelString: "Remaining seats",
                                         }
                                     }]
                                 },
@@ -125,7 +124,7 @@ const trainrecords = new Vue({
                                 },
                                 hover: {
                                     mode: "index",
-                                    intersect: true
+                                    intersect: true,
                                 },
                             }
                         }));
@@ -135,7 +134,7 @@ const trainrecords = new Vue({
                             type: "line",
                             data: {
                                 labels: dates,
-                                datasets: datasetsPrice
+                                datasets: datasetsPrice,
                             },
                             options: {
                                 title: {
@@ -152,8 +151,8 @@ const trainrecords = new Vue({
                                         id: 'y-axis-1',
                                         scaleLabel: {
                                             display: true,
-                                            labelString: "Price (€)"
-                                        }
+                                            labelString: "Price (€)",
+                                        },
                                     }]
                                 },
                                 tooltips: {
@@ -162,13 +161,33 @@ const trainrecords = new Vue({
                                 },
                                 hover: {
                                     mode: "index",
-                                    intersect: true
+                                    intersect: true,
                                 },
                             }
                         }));
                     }
+                    var graphs = document.getElementsByTagName('canvas');
+                    for (i = 0; i < graphs.length; i++) {
+                        console.log(graphs[i].textContent, graphs[i].innerText);
+                    }
                 })
                 .finally(() => (this.loading = false));
-        }
+        },
+
+        search: function () {
+            var input = document.getElementById('searchbar');
+            var filter = input.value.toUpperCase();
+            var graphs = document.getElementsByTagName('canvas');
+            console.log(filter);
+            console.log(graphs);
+            for (i = 0; i < graphs.length; i++) {
+                var graph_id = graphs[i].id;
+                if (graph_id.toUpperCase().indexOf(filter) > -1) {
+                    graphs[i].style.display = "";
+                } else {
+                    graphs[i].style.display = "none";
+                }
+            }
+        },
     }
 });

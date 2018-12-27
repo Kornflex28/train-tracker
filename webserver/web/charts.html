@@ -10,8 +10,10 @@
 </head>
 
 <body>
+    <div id="trainrecords">
     <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
         <a class="navbar-brand col-1 mr-0" href="index.html">train-tracker</a>
+        <input class="form-control form-control-dark" type="text" id="searchbar" v-on:keyup="search" placeholder="Search for trains...">
     </nav>
     <div class="container">
         <div class="row ">
@@ -35,7 +37,7 @@
                         </li>
                     </ul>
             </nav>
-            <div class="col" id="trainrecords" role="main">
+            <div class="col" role="main">
                 <div class="alert alert-info" v-show="loading">
                     Loading...
                 </div>
@@ -59,6 +61,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.21/dist/vue.js"></script>
     <script src="js/charts.js"></script>
+    </div>
 </body>
 
 <footer class="page-footer">
