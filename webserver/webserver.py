@@ -6,7 +6,9 @@ import datetime as dt
 from mongoengine import *
 
 import sys
-sys.path.append('..')
+import utils.credentials
+
+sys.path.append(PATH)
 
 
 from database.Request import Request as dbRequest

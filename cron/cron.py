@@ -1,5 +1,7 @@
 import sys
-sys.path.append('..')
+import utils.credentials
+
+sys.path.append(PATH)
 
 import datetime as dt
 
