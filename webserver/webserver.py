@@ -409,9 +409,9 @@ class TrainRecords(Resource):
         db_trainrecords = dbTrainRecord.objects
         trainrecords = json.loads(db_trainrecords.to_json())
         for k in range(len(trainrecords)):
-            trainrecords[k]['recordedTime'] = str((db_trainrecords[k]['recordedTime']))
-            trainrecords[k]['arrivalTime'] = str((db_trainrecords[k]['arrivalTime']))
-            trainrecords[k]['departureTime'] = str((db_trainrecords[k]['departureTime']))
+            trainrecords[k]['recordedTime'] = str((db_trainrecords[k]['recordedTime'].isoformat()))
+            trainrecords[k]['arrivalTime'] = str((db_trainrecords[k]['arrivalTime'].isoformat()))
+            trainrecords[k]['departureTime'] = str((db_trainrecords[k]['departureTime'].isoformat()))
             trainrecords[k]['propositions'] = {}
             for db_proposition in db_trainrecords[k]['propositions'] :
                 trainrecords[k]['propositions'][db_proposition.type] = {'amount': db_proposition.amount, 'seats': db_proposition.remainingSeat}
@@ -437,9 +437,9 @@ class TrainRecord(Resource):
         if dbTrainRecord.objects(id=trainrecord_id).first() is not None:
             db_trainrecord = dbTrainRecord.objects(id=trainrecord_id).first()
             trainrecord = json.loads(db_trainrecord.to_json())
-            trainrecord['recordedTime'] = str((db_trainrecord['recordedTime']))
-            trainrecord['arrivalTime'] = str((db_trainrecord['arrivalTime']))
-            trainrecord['departureTime'] = str((db_trainrecord['departureTime']))
+            trainrecord['recordedTime'] = str((db_trainrecord['recordedTime']).isoformat())
+            trainrecord['arrivalTime'] = str((db_trainrecord['arrivalTime']).isoformat())
+            trainrecord['departureTime'] = str((db_trainrecord['departureTime']).isoformat())
             trainrecord['propositions'] = {}
             for db_proposition in db_trainrecord['propositions'] :
                 trainrecord['propositions'][db_proposition.type] = {'amount': db_proposition.amount, 'seats': db_proposition.remainingSeat}
