@@ -410,8 +410,9 @@ class TrainRecords(Resource):
             trainrecords[k]['recordedTime'] = str((db_trainrecords[k]['recordedTime']))
             trainrecords[k]['arrivalTime'] = str((db_trainrecords[k]['arrivalTime']))
             trainrecords[k]['departureTime'] = str((db_trainrecords[k]['departureTime']))
-            trainrecords[k]['propositions'] = [{'type': db_proposition.type, 'amount': db_proposition.amount, 'seats': db_proposition.remainingSeat} for db_proposition
-                                               in db_trainrecords[k]['propositions']]
+            trainrecords[k]['propositions'] = {}
+            for db_proposition in db_trainrecords[k]['propositions'] :
+                trainrecords[k]['propositions'][db_proposition.type] = {'amount': db_proposition.amount, 'seats': db_proposition.remainingSeat}
             trainrecords[k]['destination'] = db_trainrecords[k]['destination'].name
             trainrecords[k]['origin'] = db_trainrecords[k]['origin'].name
         return trainrecords, 200
@@ -437,8 +438,9 @@ class TrainRecord(Resource):
             trainrecord['recordedTime'] = str((db_trainrecord['recordedTime']))
             trainrecord['arrivalTime'] = str((db_trainrecord['arrivalTime']))
             trainrecord['departureTime'] = str((db_trainrecord['departureTime']))
-            trainrecord['propositions'] = [{'type': db_proposition.type, 'amount': db_proposition.amount, 'seats': db_proposition.remainingSeat} for db_proposition
-                                           in db_trainrecord['propositions']]
+            trainrecord['propositions'] = {}
+            for db_proposition in db_trainrecord['propositions'] :
+                trainrecord['propositions'][db_proposition.type] = {'amount': db_proposition.amount, 'seats': db_proposition.remainingSeat}
             trainrecord['destination'] = db_trainrecord['destination'].name
             trainrecord['origin'] = db_trainrecord['origin'].name
             return trainrecord, 200

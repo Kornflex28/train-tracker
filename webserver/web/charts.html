@@ -1,6 +1,6 @@
 <head>
     <meta charset="utf-8">
-    <title>train tracker - Index</title>
+    <title>train tracker - Charts</title>
     <meta author="Louis Chauvet" content="">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
         crossorigin="anonymous">
@@ -10,21 +10,23 @@
 </head>
 
 <body>
+    <div id="trainrecords">
     <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
         <a class="navbar-brand col-1 mr-0" href="index.html">train-tracker</a>
+        <input class="form-control form-control-dark" type="text" id="searchbar" v-on:keyup="search" placeholder="Search for trains...">
     </nav>
     <div class="container">
-        <div class="row">
-            <nav class="col-1  bg-light sidebar">
+        <div class="row ">
+            <nav class="col-1 bg-light sidebar">
                 <div class="sidebar-sticky">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link active" href="index.html">
+                            <a class="nav-link" href="index.html">
                                 Index
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="charts.html">
+                            <a class="nav-link active" href="charts.html">
                                 Charts
                             </a>
                         </li>
@@ -34,29 +36,16 @@
                             </a>
                         </li>
                     </ul>
-                </div>
             </nav>
-            <div class="col-md ml-sm-auto" id="trainrecords" role="main">
+            <div class="col" role="main">
                 <div class="alert alert-info" v-show="loading">
                     Loading...
                 </div>
-                <h2>Train Records ({{trainrecords.length}})</h2>
-                <ul>
-                    <li v-for="trainrecord in trainrecords">
-                        De <strong>{{ trainrecord.origin }}</strong> à <strong>{{ trainrecord.destination }}</strong>
-                        le <strong>{{ trainrecord.departureTime }}</strong> il reste au jour du
-                        <strong>{{ trainrecord.recordedTime }}</strong>
-                        <ul>
-                            <li v-for="(proposition,type) in trainrecord['propositions']">
-                                <strong>{{ proposition.seats }}</strong> places à <strong>{{proposition.amount}}€</strong>
-                                en <strong>{{type}}</strong>
-
-                            </li>
-                        </ul>
-
-
-                    </li>
-                </ul>
+                <h2>Charts</h2>
+                <div class="row" v-show="charts != []" v-for="chart in chartsName">
+                    <div class="col"><canvas :id=chart></canvas></div>
+                    <div class="col"><canvas :id=chart+"P"></canvas></div>
+                </div>
             </div>
         </div>
     </div>
@@ -67,9 +56,12 @@
         crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
         crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+    <script src="https://unpkg.com/vue-chartjs/dist/vue-chartjs.min.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.21/dist/vue.js"></script>
-    <script src="js/index.js"></script>
+    <script src="js/charts.js"></script>
+    </div>
 </body>
 
 <footer class="page-footer">
