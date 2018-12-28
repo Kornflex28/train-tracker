@@ -1,7 +1,7 @@
 import sys
-import utils.credentials
 
-sys.path.append(PATH)
+sys.path.append("/root/train-tracker/")
+import utils.credentials
 
 import datetime as dt
 
