@@ -48,11 +48,11 @@
                         </div>
                         <div class="col text-right">
                             <div class="btn-group btn-group-toggle mr-2" data-toggle="buttons">
-                                <label class="btn btn-sm btn-outline-secondary">
-                                    <input type="checkbox" @click="filterMedia('seats')">Seats</input>
+                                <label class="btn btn btn-outline-secondary active" @click="filterMedia('seats')">
+                                    <input type="checkbox" id="display" value="seats" >Seats</input>
                                 </label>
-                                <label class="btn btn-sm btn-outline-secondary">
-                                    <input type="checkbox" class="btn btn-sm btn-outline-secondary" @click="filterMedia('prices')">Prices</input>
+                                <label class="btn btn btn-outline-secondary active" @click="filterMedia('prices')">
+                                    <input type="checkbox" id="display" value="prices" >Prices</input>
                                 </label>
                             </div>
                         </div>
