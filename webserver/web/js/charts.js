@@ -6,7 +6,7 @@ const trainrecords = new Vue({
         trainrecords: [],
         trains: [],
         loading: false,
-        display: {'prices': true, 'seats': true},
+        display: { 'prices': true, 'seats': true },
     },
     mounted: function () {
         this.formData();
@@ -187,6 +187,7 @@ const trainrecords = new Vue({
 
         filterMedia: function (className) {
             var graphs = document.getElementsByTagName('canvas');
+            var otherClass = (className == 'seats') ? 'prices' : 'seats';
 
             this.display[className] = !this.display[className];
             for (i = 0; i < graphs.length; i++) {
@@ -194,9 +195,24 @@ const trainrecords = new Vue({
                 if (graph_class.indexOf(className) > -1) {
                     if (this.display[className]) {
                         graphs[i].parentNode.style.display = "";
+                        if (this.display[otherClass]) {
+                            graphs[i].parentNode.className = "col-6";
+                        }
+                        else {
+                            graphs[i].parentNode.className = "col";
+                        }
                     }
                     else {
                         graphs[i].parentNode.style.display = "none";
+                    }
+                }
+
+                else {
+                    if (this.display[className] && this.display[otherClass]) {
+                        graphs[i].parentNode.className = "col-6";
+                    }
+                    else {
+                        graphs[i].parentNode.className = "col";
                     }
                 }
             }
