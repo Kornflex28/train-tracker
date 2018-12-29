@@ -10,57 +10,58 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-        <a class="navbar-brand col-1 mr-0" href="index.html">train-tracker</a>
-    </nav>
-    <div class="container">
-        <div class="row">
-            <nav class="col-1  bg-light sidebar">
-                <div class="sidebar-sticky">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="index.html">
-                                Index
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="charts.html">
-                                Charts
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="about.html">
-                                About
-                            </a>
+    <div id="trainrecords">
+        <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+            <a class="navbar-brand col-1 mr-0" href="index.html">train-tracker</a>
+        </nav>
+        <div class="container">
+            <div class="row">
+                <nav class="col-1  bg-light sidebar">
+                    <div class="sidebar-sticky">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="index.html">
+                                    Index
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="charts.html">
+                                    Charts
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="about.html">
+                                    About
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                <div class="col-md ml-sm-auto" role="main">
+                    <div class="alert alert-info" v-show="loading">
+                        Loading...
+                    </div>
+                    <h2>Train Records ({{trainrecords.length}})</h2>
+                    <ul>
+                        <li v-for="trainrecord in trainrecords">
+                            De <strong>{{ trainrecord.origin }}</strong> à <strong>{{ trainrecord.destination }}</strong>
+                            le <strong>{{ trainrecord.departureTime }}</strong> il reste au jour du
+                            <strong>{{ trainrecord.recordedTime }}</strong>
+                            <ul>
+                                <li v-for="(proposition,type) in trainrecord['propositions']">
+                                    <strong>{{ proposition.seats }}</strong> places à <strong>{{proposition.amount}}€</strong>
+                                    en <strong>{{type}}</strong>
+
+                                </li>
+                            </ul>
+
+
                         </li>
                     </ul>
                 </div>
-            </nav>
-            <div class="col-md ml-sm-auto" id="trainrecords" role="main">
-                <div class="alert alert-info" v-show="loading">
-                    Loading...
-                </div>
-                <h2>Train Records ({{trainrecords.length}})</h2>
-                <ul>
-                    <li v-for="trainrecord in trainrecords">
-                        De <strong>{{ trainrecord.origin }}</strong> à <strong>{{ trainrecord.destination }}</strong>
-                        le <strong>{{ trainrecord.departureTime }}</strong> il reste au jour du
-                        <strong>{{ trainrecord.recordedTime }}</strong>
-                        <ul>
-                            <li v-for="(proposition,type) in trainrecord['propositions']">
-                                <strong>{{ proposition.seats }}</strong> places à <strong>{{proposition.amount}}€</strong>
-                                en <strong>{{type}}</strong>
-
-                            </li>
-                        </ul>
-
-
-                    </li>
-                </ul>
             </div>
         </div>
     </div>
-
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"

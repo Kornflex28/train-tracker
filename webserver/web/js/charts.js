@@ -6,6 +6,7 @@ const trainrecords = new Vue({
         trainrecords: [],
         trains: [],
         loading: false,
+        display: {'prices':true, 'seats': true},
     },
     mounted: function () {
         this.formData();
@@ -14,7 +15,7 @@ const trainrecords = new Vue({
     methods: {
         formData: function () {
             this.loading = true;
-            fetch("http://127.0.0.1:8080/trainrecords")
+            fetch("http://localhost:8080/trainrecords")
                 .then(response => response.json())
                 .then((trainrecords) => {
                     for (i = 0; i < trainrecords.length; i++) {
@@ -91,7 +92,7 @@ const trainrecords = new Vue({
                         }
                         spTrain = train.split("_");
                         var title = "De " + spTrain[0].split("(")[0] + "à " + spTrain[2].split("(")[0] + "le " + spTrain[1];
-                        var ctxS = document.getElementById(train);
+                        var ctxS = document.getElementById(train + "Seats");
                         this.charts.push(new Chart(ctxS, {
                             type: "line",
                             data: {
@@ -129,7 +130,7 @@ const trainrecords = new Vue({
                             }
                         }));
 
-                        var ctxP = document.getElementById(train + "P");
+                        var ctxP = document.getElementById(train + "Prices");
                         this.charts.push(new Chart(ctxP, {
                             type: "line",
                             data: {
@@ -183,5 +184,21 @@ const trainrecords = new Vue({
                 }
             }
         },
+
+        filterMedia: function (className) {
+            var graphs = document.getElementsByTagName('canvas');
+            this.display[className] = !this.display[className];
+            for (i = 0; i < graphs.length; i++) {
+                var graph_class = graphs[i].className;
+                if (graph_class.indexOf(className) > -1) {
+                    if (this.display[className]) {
+                        graphs[i].parentNode.style.display = "";
+                    }
+                    else {
+                        graphs[i].parentNode.style.display = "none";
+                    }
+                }
+            }
+        }
     }
 });

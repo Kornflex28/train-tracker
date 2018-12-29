@@ -11,45 +11,60 @@
 
 <body>
     <div id="trainrecords">
-    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-        <a class="navbar-brand col-1 mr-0" href="index.html">train-tracker</a>
-        <input class="form-control form-control-dark" type="text" id="searchbar" v-on:keyup="search" placeholder="Search for trains...">
-    </nav>
-    <div class="container">
-        <div class="row ">
-            <nav class="col-1 bg-light sidebar">
-                <div class="sidebar-sticky">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="index.html">
-                                Index
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="charts.html">
-                                Charts
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="about.html">
-                                About
-                            </a>
-                        </li>
-                    </ul>
-            </nav>
-            <div class="col" role="main">
-                <div class="alert alert-info" v-show="loading">
-                    Loading...
-                </div>
-                <h2>Charts</h2>
-                <div class="row" v-show="charts != []" v-for="chart in chartsName">
-                    <div class="col"><canvas :id=chart></canvas></div>
-                    <div class="col"><canvas :id=chart+"P"></canvas></div>
+        <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+            <a class="navbar-brand col-1 mr-0" href="index.html">train-tracker</a>
+            <input class="form-control form-control-dark" type="text" id="searchbar" v-on:keyup="search" placeholder="Search for trains...">
+        </nav>
+        <div class="container">
+            <div class="row ">
+                <nav class="col-1 bg-light sidebar">
+                    <div class="sidebar-sticky">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link" href="index.html">
+                                    Index
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" href="charts.html">
+                                    Charts
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="about.html">
+                                    About
+                                </a>
+                            </li>
+                        </ul>
+                </nav>
+                <div class="col" role="main">
+                    <div class="alert alert-info" v-show="loading">
+                        Loading...
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <h2>Charts</h2>
+                            <i>12-25 yo and Youngs Card</i>
+                        </div>
+                        <div class="col text-right">
+                            <div class="btn-group btn-group-toggle mr-2" data-toggle="buttons">
+                                <label class="btn btn-sm btn-outline-secondary">
+                                    <input type="checkbox" @click="filterMedia('seats')">Seats</input>
+                                </label>
+                                <label class="btn btn-sm btn-outline-secondary">
+                                    <input type="checkbox" class="btn btn-sm btn-outline-secondary" @click="filterMedia('prices')">Prices</input>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" v-show="charts != []" v-for="chart in chartsName">
+                        <div class="col"><canvas class="seats" :id=chart+"Seats"></canvas></div>
+                        <div class="col"><canvas class="prices" :id=chart+"Prices"></canvas></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
@@ -61,7 +76,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.21/dist/vue.js"></script>
     <script src="js/charts.js"></script>
-    </div>
 </body>
 
 <footer class="page-footer">

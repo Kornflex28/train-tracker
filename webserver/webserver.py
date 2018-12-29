@@ -8,7 +8,7 @@ from mongoengine import *
 import sys
 
 
-sys.path.append("/root/train-tracker/")
+sys.path.append("..")
 import utils.credentials
 
 from database.Request import Request as dbRequest
