@@ -4,6 +4,7 @@ from flask_cors import CORS
 import json
 import datetime as dt
 from mongoengine import *
+import time
 
 import sys
 
@@ -33,12 +34,15 @@ class Requests(Resource):
         Get the list of all the requests registered in the database.
         :return: A list of JSON each containing a request.
         """
+        start = time.time()
         db_requests = dbRequest.objects
         requests = json.loads(db_requests.to_json())
         for k in range(len(requests)):
             requests[k]['date'] = str((db_requests[k]['date']))
             requests[k]['destination'] = db_requests[k]['destination'].name
             requests[k]['origin'] = db_requests[k]['origin'].name
+        end = time.time()
+        print( "GET /requests took "+str(end-start)+" s")
         return requests, 200
 
     @staticmethod
@@ -203,7 +207,11 @@ class Stations(Resource):
         Get the list of all the stations registered in the database.
         :return: A list of JSON each containing a station.
         """
-        return json.loads(dbStation.objects.to_json()), 200
+        start = time.time()
+        stations = json.loads(dbStation.objects.to_json())
+        end = time.time()
+        print( "GET /stations took "+str(end-start)+" s")
+        return stations, 200
 
     @staticmethod
     def post():
@@ -406,17 +414,34 @@ class TrainRecords(Resource):
         Get the list of all the train records registered in the database.
         :return: A list of JSON each containing a train record.
         """
-        db_trainrecords = dbTrainRecord.objects
+        start = time.time()
+        db_trainrecords = dbTrainRecord.objects.order_by("origin","departureTime","destination")
         trainrecords = json.loads(db_trainrecords.to_json())
         for k in range(len(trainrecords)):
-            trainrecords[k]['recordedTime'] = str((db_trainrecords[k]['recordedTime'].isoformat()))
-            trainrecords[k]['arrivalTime'] = str((db_trainrecords[k]['arrivalTime'].isoformat()))
-            trainrecords[k]['departureTime'] = str((db_trainrecords[k]['departureTime'].isoformat()))
-            trainrecords[k]['propositions'] = {}
-            for db_proposition in db_trainrecords[k]['propositions'] :
-                trainrecords[k]['propositions'][db_proposition.type] = {'amount': db_proposition.amount, 'seats': db_proposition.remainingSeat}
-            trainrecords[k]['destination'] = db_trainrecords[k]['destination'].name
-            trainrecords[k]['origin'] = db_trainrecords[k]['origin'].name
+            #step1 = time.time()
+            #step2 = time.time()
+            #print("step 1 took {} s".format(step2-step1))
+            trainrecords[k]['arrivalTime'] = str((db_trainrecords[k].arrivalTime.isoformat()))
+            #step3 = time.time()
+            #print("step 2 took {} s".format(step3-step2))
+            trainrecords[k]['departureTime'] = str((db_trainrecords[k].departureTime.isoformat()))
+            #step4 = time.time()
+            #print("step 3 took {} s".format(step4-step3))
+            trainrecords[k]['propositions'] = []
+            for db_propositions in db_trainrecords[k].propositions:
+                content={}
+                for db_proposition in db_propositions.content:
+                    content[db_proposition.type] = {'amount': db_proposition.amount, 'seats': db_proposition.remainingSeat}
+                trainrecords[k]['propositions'].append({'recordedTime': db_propositions.recordedTime.isoformat(), 'content':content})
+            #step5 = time.time()
+            #print("step 4 took {} s".format(step5-step4))
+            trainrecords[k]['destination'] = db_trainrecords[k].destination.name
+            trainrecords[k]['origin'] = db_trainrecords[k].origin.name
+            #print("One trainrecord took {} s".format(step5-step1))
+
+
+        end = time.time()
+        print( "GET /trainrecords took "+str(end-start)+" s")
         return trainrecords, 200
 
 
@@ -437,13 +462,15 @@ class TrainRecord(Resource):
         if dbTrainRecord.objects(id=trainrecord_id).first() is not None:
             db_trainrecord = dbTrainRecord.objects(id=trainrecord_id).first()
             trainrecord = json.loads(db_trainrecord.to_json())
-            trainrecord['recordedTime'] = str((db_trainrecord['recordedTime']).isoformat())
+            #trainrecord['recordedTime'] = str((db_trainrecord['recordedTime']).isoformat())
             trainrecord['arrivalTime'] = str((db_trainrecord['arrivalTime']).isoformat())
             trainrecord['departureTime'] = str((db_trainrecord['departureTime']).isoformat())
-            trainrecord['propositions'] = {}
-            for db_proposition in db_trainrecord['propositions'] :
-                trainrecord['propositions'][db_proposition.type] = {'amount': db_proposition.amount, 'seats': db_proposition.remainingSeat}
-            trainrecord['destination'] = db_trainrecord['destination'].name
+            trainrecord['propositions'] = []
+            for db_propositions in db_trainrecord.propositions:
+                content={}
+                for db_proposition in db_propositions.content:
+                    content[db_proposition.type] = {'amount': db_proposition.amount, 'seats': db_proposition.remainingSeat}
+                trainrecord['propositions'].append({'recordedTime': db_propositions.recordedTime.isoformat(), 'content':content})
             trainrecord['origin'] = db_trainrecord['origin'].name
             return trainrecord, 200
         else:

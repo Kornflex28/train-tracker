@@ -2,7 +2,7 @@ from utils.date import DateTime
 import requests
 from database.Station import Station
 from database.TrainRecord import TrainRecord
-from database.Proposition import Proposition
+from database.Proposition import Proposition,Propositions
 
 
 class Travel:
@@ -27,15 +27,30 @@ class Travel:
                             remainingSeat=proposition['remaining_seat'])
             p.save()
             list_of_proposition.append(p)
-
-        tr = TrainRecord(departureTime=self.departure_date,
+        propositions = Propositions(recordedTime=self.recorded_date, content=list_of_proposition)
+        propositions.save()
+        
+        # tr = TrainRecord(departureTime=self.departure_date,
+        #                 arrivalTime=self.arrival_date,
+        #                 origin=Station.get_station_by_code(self.origin_code),
+        #                 destination=Station.get_station_by_code(self.destination_code),
+        #                 duration=self.duration,
+        #                 recordedTime=self.recorded_date,)
+        # tr.save()
+        tr = TrainRecord.objects(departureTime=self.departure_date,
+                         arrivalTime=self.arrival_date,
+                         origin=Station.get_station_by_code(self.origin_code),
+                         destination=Station.get_station_by_code(self.destination_code))
+        if not tr :
+            tr = TrainRecord(departureTime=self.departure_date,
                          arrivalTime=self.arrival_date,
                          origin=Station.get_station_by_code(self.origin_code),
                          destination=Station.get_station_by_code(self.destination_code),
                          duration=self.duration,
-                         recordedTime=self.recorded_date,
-                         propositions=list_of_proposition)
-        tr.save()
+                         propositions=[propositions])
+            tr.save()
+        else:
+            tr.update_one(push__propositions=propositions)
         return tr
 
     @staticmethod
