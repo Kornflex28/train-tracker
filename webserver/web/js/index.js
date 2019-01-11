@@ -17,7 +17,6 @@ const trainrecords = new Vue({
                     for (i = 0; i < trainrecords.length; i++) {
                         trainrecords[i]['departureTime'] = new Date(trainrecords[i]['departureTime']).toLocaleString();
                         trainrecords[i]['arrivalTime'] = new Date(trainrecords[i]['arrivalTime']).toLocaleString();
-                        trainrecords[i]['recordedTime'] = new Date(trainrecords[i]['recordedTime']).toLocaleString();
                     }
                     this.trainrecords = trainrecords;
                 })

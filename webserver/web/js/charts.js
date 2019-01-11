@@ -4,7 +4,6 @@ const trainrecords = new Vue({
         charts: [],
         chartsName: [],
         trainrecords: [],
-        trains: [],
         loading: false,
         display: { 'prices': true, 'seats': true },
     },
@@ -21,48 +20,64 @@ const trainrecords = new Vue({
                     for (i = 0; i < trainrecords.length; i++) {
                         trainrecords[i]['departureTime'] = new Date(trainrecords[i]['departureTime']).toLocaleString();
                         trainrecords[i]['arrivalTime'] = new Date(trainrecords[i]['arrivalTime']).toLocaleString();
-                        trainrecords[i]['recordedTime'] = new Date(trainrecords[i]['recordedTime']).toLocaleString();
                         trainrecords[i]['name'] = trainrecords[i]['origin'] + "_" + trainrecords[i]['departureTime'] + "_" + trainrecords[i]['destination'];
+                        this.chartsName.push(trainrecords[i]['name']);
                     }
                     this.trainrecords = trainrecords;
 
-                    var trains = {};
-                    for (i = 0; i < trainrecords.length; i++) {
-                        var train = trainrecords[i]['name'];
-                        if (!Object.keys(trains).includes(train)) {
-                            trains[train] = { 'recordedTime': [trainrecords[i]['recordedTime']], 'propositions': [trainrecords[i]['propositions']] };
-                        }
-                        else {
-                            trains[train]['recordedTime'].push(trainrecords[i]['recordedTime']);
-                            trains[train]['propositions'].push(trainrecords[i]['propositions']);
-                        }
-                    }
-                    this.trains = trains;
-                    this.chartsName = Object.keys(trains);
-                    return trains
+                    // var trains = {};
+                    // for (i = 0; i < trainrecords.length; i++) {
+                    //     var train = trainrecords[i]['name'];
+                    //     if (!Object.keys(trains).includes(train)) {
+                    //         trains[train] = { 'recordedTime': [trainrecords[i]['recordedTime']], 'propositions': [trainrecords[i]['propositions']] };
+                    //     }
+                    //     else {
+                    //         trains[train]['recordedTime'].push(trainrecords[i]['recordedTime']);
+                    //         trains[train]['propositions'].push(trainrecords[i]['propositions']);
+                    //     }
+                    // }
+                    // this.trains = trains;
+                    //this.chartsName = Object.keys(trains);
+                    return trainrecords
                 })
                 .then((trains) => {
-                    for (var train in trains) {
-                        datasetsSeats = [];
-                        datasetsPrice = [];
-                        var dates = trains[train]['recordedTime'];
+                    for (i=0; i<trains.length; i++ ) {
+                        var train = trains[i];
+                        var datasetsSeats = [];
+                        var datasetsPrice = [];
+                        var dates = [];
                         var seats = {};
                         var prices = {};
+                        for (k=0;k<train['propositions'].length;k++) {
+                            var proposition = train['propositions'][k]
+                            dates.push(new Date(proposition['recordedTime']).toLocaleString())
 
-                        for (i = 0; i < trains[train]['propositions'].length; i++) {
-                            for (proposition in trains[train]['propositions'][i]) {
-                                if (!Object.keys(seats).includes(proposition)) {
-                                    seats[proposition] = [(trains[train]['propositions'][i][proposition]['seats'])];
-                                    prices[proposition] = [(trains[train]['propositions'][i][proposition]['amount'])];
+                            for (var classType in proposition['content']) {
+                                if (!Object.keys(seats).includes(classType)) {
+                                    seats[classType] = [proposition['content'][classType]['seats']];
+                                    prices[classType] = [proposition['content'][classType]['amount']];
                                 }
                                 else {
-                                    //console.log(train,proposition,seats)
-                                    seats[proposition].push((trains[train]['propositions'][i][proposition]['seats']));
-                                    prices[proposition].push((trains[train]['propositions'][i][proposition]['amount']));
+                                    seats[classType].push(proposition['content'][classType]['seats']);
+                                    prices[classType].push(proposition['content'][classType]['amount']);
                                 }
                             }
-
                         }
+                        
+                        // for (i = 0; i < trains[train]['propositions'].length; i++) {
+                        //     for (proposition in trains[train]['propositions'][i]) {
+                        //         if (!Object.keys(seats).includes(proposition)) {
+                        //             seats[proposition] = [(trains[train]['propositions'][i][proposition]['seats'])];
+                        //             prices[proposition] = [(trains[train]['propositions'][i][proposition]['amount'])];
+                        //         }
+                        //         else {
+                        //             //console.log(train,proposition,seats)
+                        //             seats[proposition].push((trains[train]['propositions'][i][proposition]['seats']));
+                        //             prices[proposition].push((trains[train]['propositions'][i][proposition]['amount']));
+                        //         }
+                        //     }
+
+                        // }
 
                         var k = 0
                         for (proposition in seats) {
@@ -90,9 +105,9 @@ const trainrecords = new Vue({
                             });
                             k += 1;
                         }
-                        spTrain = train.split("_");
-                        var title = "De " + spTrain[0].split("(")[0] + "à " + spTrain[2].split("(")[0] + "le " + spTrain[1];
-                        var ctxS = document.getElementById(train + "Seats");
+                        var spTrain = train['name'].split("_");
+                        var title = spTrain[0].split("(")[0] + "vers " + spTrain[2].split("(")[0] + "le " + spTrain[1] + " ("+train['duration']+ " min)";
+                        var ctxS = document.getElementById(train['name'] + "Seats");
                         this.charts.push(new Chart(ctxS, {
                             type: "line",
                             data: {
@@ -130,7 +145,7 @@ const trainrecords = new Vue({
                             }
                         }));
 
-                        var ctxP = document.getElementById(train + "Prices");
+                        var ctxP = document.getElementById(train['name'] + "Prices");
                         this.charts.push(new Chart(ctxP, {
                             type: "line",
                             data: {

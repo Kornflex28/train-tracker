@@ -45,15 +45,15 @@
                     <ul>
                         <li v-for="trainrecord in trainrecords">
                             De <strong>{{ trainrecord.origin }}</strong> à <strong>{{ trainrecord.destination }}</strong>
-                            le <strong>{{ trainrecord.departureTime }}</strong> il reste au jour du
-                            <strong>{{ trainrecord.recordedTime }}</strong>
+                            le <strong>{{ trainrecord.departureTime }}</strong> 
+                            <!-- il reste au jour du <strong>{{ trainrecord.recordedTime }}</strong>
                             <ul>
                                 <li v-for="(proposition,type) in trainrecord['propositions']">
                                     <strong>{{ proposition.seats }}</strong> places à <strong>{{proposition.amount}}€</strong>
                                     en <strong>{{type}}</strong>
 
                                 </li>
-                            </ul>
+                            </ul> -->
 
 
                         </li>
