@@ -6,6 +6,8 @@ class Proposition(Document):
     amount = FloatField()
     remainingSeat = IntField()
 
+
 class Propositions(Document):
     recordedTime = DateTimeField()
-    content = ListField(ReferenceField(Proposition,reverse_delete_rule=DO_NOTHING))
+    content = ListField(ReferenceField(
+        Proposition, reverse_delete_rule=DO_NOTHING))

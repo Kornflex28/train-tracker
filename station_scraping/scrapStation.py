@@ -21,7 +21,8 @@ def getGares(searchTerm):
         ('searchField', 'origin'),
         ('searchTerm', searchTerm),
     )
-    response = requests.get('https://booking.oui.sncf/widget/autocomplete-d2d', headers=headers, params=params)
+    response = requests.get(
+        'https://booking.oui.sncf/widget/autocomplete-d2d', headers=headers, params=params)
     return response.json()
 
 

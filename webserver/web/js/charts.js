@@ -41,14 +41,14 @@ const trainrecords = new Vue({
                     return trainrecords
                 })
                 .then((trains) => {
-                    for (i=0; i<trains.length; i++ ) {
+                    for (i = 0; i < trains.length; i++) {
                         var train = trains[i];
                         var datasetsSeats = [];
                         var datasetsPrice = [];
                         var dates = [];
                         var seats = {};
                         var prices = {};
-                        for (k=0;k<train['propositions'].length;k++) {
+                        for (k = 0; k < train['propositions'].length; k++) {
                             var proposition = train['propositions'][k]
                             dates.push(new Date(proposition['recordedTime']).toLocaleString())
 
@@ -63,7 +63,7 @@ const trainrecords = new Vue({
                                 }
                             }
                         }
-                        
+
                         // for (i = 0; i < trains[train]['propositions'].length; i++) {
                         //     for (proposition in trains[train]['propositions'][i]) {
                         //         if (!Object.keys(seats).includes(proposition)) {
@@ -106,7 +106,7 @@ const trainrecords = new Vue({
                             k += 1;
                         }
                         var spTrain = train['name'].split("_");
-                        var title = spTrain[0].split("(")[0] + "vers " + spTrain[2].split("(")[0] + "le " + spTrain[1] + " ("+train['duration']+ " min)";
+                        var title = spTrain[0].split("(")[0] + "vers " + spTrain[2].split("(")[0] + "le " + spTrain[1] + " (" + train['duration'] + " min)";
                         var ctxS = document.getElementById(train['name'] + "Seats");
                         this.charts.push(new Chart(ctxS, {
                             type: "line",

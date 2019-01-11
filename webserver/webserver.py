@@ -1,23 +1,19 @@
-from flask import Flask
-from flask_restful import Resource, Api, reqparse
-from flask_cors import CORS
-import json
-import datetime as dt
-from mongoengine import *
-import time
-
 import sys
-
-
+import time
+from mongoengine import *
+import datetime as dt
+import json
+from flask_cors import CORS
+from flask_restful import Resource, Api, reqparse
+from flask import Flask
 sys.path.append("..")
-import utils.credentials
 
+import utils.credentials
 from database.Request import Request as dbRequest
 from database.Station import Station as dbStation
 from database.Proposition import Proposition as dbProposition
 from database.TrainRecord import TrainRecord as dbTrainRecord
 
-import utils.credentials
 
 app = Flask(__name__)
 api = Api(app)
@@ -42,7 +38,7 @@ class Requests(Resource):
             requests[k]['destination'] = db_requests[k]['destination'].name
             requests[k]['origin'] = db_requests[k]['origin'].name
         end = time.time()
-        print( "GET /requests took "+str(end-start)+" s")
+        print("GET /requests took "+str(end-start)+" s")
         return requests, 200
 
     @staticmethod
@@ -59,7 +55,8 @@ class Requests(Resource):
 
         # requests parser
         requests_parser = reqparse.RequestParser()
-        requests_parser.add_argument(name='origin', type=str, required=True, help="The code of the origin station")
+        requests_parser.add_argument(
+            name='origin', type=str, required=True, help="The code of the origin station")
         requests_parser.add_argument(name='destination', type=str, required=True,
                                      help="The  code of the destination station")
         requests_parser.add_argument(name='date', type=str, required=True,
@@ -69,8 +66,10 @@ class Requests(Resource):
         requests_args = requests_parser.parse_args()
 
         # gets the corresponding Station object
-        origin_station = dbStation().get_station_by_code(requests_args['origin'])
-        destination_station = dbStation().get_station_by_code(requests_args['destination'])
+        origin_station = dbStation().get_station_by_code(
+            requests_args['origin'])
+        destination_station = dbStation().get_station_by_code(
+            requests_args['destination'])
 
         if requests_args['gapTime'] == 0:
             unique_date = True
@@ -80,21 +79,24 @@ class Requests(Resource):
         # checks if the request already exists in the database
         request_exist = dbRequest.objects(origin=origin_station, destination=destination_station,
                                           uniqueDate=unique_date,
-                                          date=dt.datetime.strptime(requests_args['date'], "%Y-%m-%d %H:%M:%S"),
+                                          date=dt.datetime.strptime(
+                                              requests_args['date'], "%Y-%m-%d %H:%M:%S"),
                                           gapTime=requests_args['gapTime']).first() is not None
 
         if request_exist:
             request_id = dbRequest.objects(origin=origin_station,
                                            destination=destination_station,
                                            uniqueDate=unique_date,
-                                           date=dt.datetime.strptime(requests_args['date'], "%Y-%m-%d %H:%M:%S"),
+                                           date=dt.datetime.strptime(
+                                               requests_args['date'], "%Y-%m-%d %H:%M:%S"),
                                            gapTime=requests_args['gapTime']).first().id
             return "The request already exists at id {}".format(request_id), 208
         else:
             request = dbRequest(origin=origin_station,
                                 destination=destination_station,
                                 uniqueDate=unique_date,
-                                date=dt.datetime.strptime(requests_args['date'], "%Y-%m-%d %H:%M:%S"),
+                                date=dt.datetime.strptime(
+                                    requests_args['date'], "%Y-%m-%d %H:%M:%S"),
                                 gapTime=requests_args['gapTime'])
             request.save()
 
@@ -153,8 +155,10 @@ class Request(Resource):
 
         # request parser
         request_parser = reqparse.RequestParser()
-        request_parser.add_argument(name='origin', type=str, help="The code of the origin station")
-        request_parser.add_argument(name='destination', type=str, help="The  code of the destination station")
+        request_parser.add_argument(
+            name='origin', type=str, help="The code of the origin station")
+        request_parser.add_argument(
+            name='destination', type=str, help="The  code of the destination station")
         request_parser.add_argument(name='date', type=str,
                                     help="The date of the first request; format : '%Y-%m-%d %H:%M:%S'")
         request_parser.add_argument(name='gapTime', type=int,
@@ -169,7 +173,8 @@ class Request(Resource):
         if request_args['destination'] is None:
             request_args['destination'] = request.destination.code
         if request_args['date'] is None:
-            request_args['date'] = dt.datetime.strftime(request.date, "%Y-%m-%d %H:%M:%S")
+            request_args['date'] = dt.datetime.strftime(
+                request.date, "%Y-%m-%d %H:%M:%S")
         if request_args['gapTime'] is None:
             request_args['gapTime'] = request.gapTime
 
@@ -178,8 +183,10 @@ class Request(Resource):
         else:
             unique_date = False
 
-        origin_station = dbStation().get_station_by_code(request_args['origin'])
-        destination_station = dbStation().get_station_by_code(request_args['destination'])
+        origin_station = dbStation().get_station_by_code(
+            request_args['origin'])
+        destination_station = dbStation().get_station_by_code(
+            request_args['destination'])
 
         dbRequest.objects(id=request_id).update_one(set__origin=origin_station,
                                                     set__destination=destination_station, set__uniqueDate=unique_date,
@@ -210,7 +217,7 @@ class Stations(Resource):
         start = time.time()
         stations = json.loads(dbStation.objects.to_json())
         end = time.time()
-        print( "GET /stations took "+str(end-start)+" s")
+        print("GET /stations took "+str(end-start)+" s")
         return stations, 200
 
     @staticmethod
@@ -225,18 +232,23 @@ class Stations(Resource):
 
         # stations parser
         stations_parser = reqparse.RequestParser()
-        stations_parser.add_argument(name='code', type=str, required=True, help="The  code of the station (i.e. FRAFJ)")
-        stations_parser.add_argument(name='name', type=str, required=True, help="The name of the station")
+        stations_parser.add_argument(
+            name='code', type=str, required=True, help="The  code of the station (i.e. FRAFJ)")
+        stations_parser.add_argument(
+            name='name', type=str, required=True, help="The name of the station")
         stations_args = stations_parser.parse_args()
 
         # checks if the station already exists in the database
-        station_exist = dbStation.objects(code=stations_args['code'], name=stations_args['name']).first() is not None
+        station_exist = dbStation.objects(
+            code=stations_args['code'], name=stations_args['name']).first() is not None
 
         if station_exist:
-            station_id = dbStation.objects(code=stations_args['code'], name=stations_args['name']).first().id
+            station_id = dbStation.objects(
+                code=stations_args['code'], name=stations_args['name']).first().id
             return "The station already exists at id {}".format(station_id), 208
         else:
-            station = dbStation(code=stations_args['code'], name=stations_args['name'])
+            station = dbStation(
+                code=stations_args['code'], name=stations_args['name'])
             station.save()
             return json.loads(station.to_json()), 201
 
@@ -281,8 +293,10 @@ class Station(Resource):
 
         # station parser
         station_parser = reqparse.RequestParser()
-        station_parser.add_argument(name='code', type=str, help="The  code of the station (i.e. FRAFJ)")
-        station_parser.add_argument(name='name', type=str, help="The name of the station")
+        station_parser.add_argument(
+            name='code', type=str, help="The  code of the station (i.e. FRAFJ)")
+        station_parser.add_argument(
+            name='name', type=str, help="The name of the station")
         station_args = station_parser.parse_args()
 
         station = dbStation.objects(id=station_id).first()
@@ -293,7 +307,8 @@ class Station(Resource):
         if station_args['name'] is None:
             station_args['name'] = station.name
 
-        dbStation.objects(id=station_id).update_one(set__code=station_args['code'], set__name=station_args['name'])
+        dbStation.objects(id=station_id).update_one(
+            set__code=station_args['code'], set__name=station_args['name'])
         return json.loads(dbStation.objects(id=station_id).first().to_json()), 200
 
 
@@ -372,7 +387,7 @@ class Proposition(Resource):
         """
         dbProposition.objects(id=proposition_id).delete()
         return "", 204
-    
+
     # @staticmethod
     # def put(proposition_id):
     #     """
@@ -415,33 +430,38 @@ class TrainRecords(Resource):
         :return: A list of JSON each containing a train record.
         """
         start = time.time()
-        db_trainrecords = dbTrainRecord.objects.order_by("origin","departureTime","destination")
+        db_trainrecords = dbTrainRecord.objects.order_by(
+            "origin", "departureTime", "destination")
         trainrecords = json.loads(db_trainrecords.to_json())
         for k in range(len(trainrecords)):
             #step1 = time.time()
+            #trainrecords[k]['recordedTime'] = str((db_trainrecords[k]['recordedTime']).isoformat())
             #step2 = time.time()
             #print("step 1 took {} s".format(step2-step1))
-            trainrecords[k]['arrivalTime'] = str((db_trainrecords[k].arrivalTime.isoformat()))
+            trainrecords[k]['arrivalTime'] = str(
+                (db_trainrecords[k].arrivalTime.isoformat()))
             #step3 = time.time()
             #print("step 2 took {} s".format(step3-step2))
-            trainrecords[k]['departureTime'] = str((db_trainrecords[k].departureTime.isoformat()))
+            trainrecords[k]['departureTime'] = str(
+                (db_trainrecords[k].departureTime.isoformat()))
             #step4 = time.time()
             #print("step 3 took {} s".format(step4-step3))
             trainrecords[k]['propositions'] = []
             for db_propositions in db_trainrecords[k].propositions:
-                content={}
+                content = {}
                 for db_proposition in db_propositions.content:
-                    content[db_proposition.type] = {'amount': db_proposition.amount, 'seats': db_proposition.remainingSeat}
-                trainrecords[k]['propositions'].append({'recordedTime': db_propositions.recordedTime.isoformat(), 'content':content})
+                    content[db_proposition.type] = {
+                        'amount': db_proposition.amount, 'seats': db_proposition.remainingSeat}
+                trainrecords[k]['propositions'].append(
+                    {'recordedTime': db_propositions.recordedTime.isoformat(), 'content': content})
             #step5 = time.time()
             #print("step 4 took {} s".format(step5-step4))
             trainrecords[k]['destination'] = db_trainrecords[k].destination.name
             trainrecords[k]['origin'] = db_trainrecords[k].origin.name
             #print("One trainrecord took {} s".format(step5-step1))
 
-
         end = time.time()
-        print( "GET /trainrecords took "+str(end-start)+" s")
+        print("GET /trainrecords took "+str(end-start)+" s")
         return trainrecords, 200
 
 
@@ -463,14 +483,18 @@ class TrainRecord(Resource):
             db_trainrecord = dbTrainRecord.objects(id=trainrecord_id).first()
             trainrecord = json.loads(db_trainrecord.to_json())
             #trainrecord['recordedTime'] = str((db_trainrecord['recordedTime']).isoformat())
-            trainrecord['arrivalTime'] = str((db_trainrecord['arrivalTime']).isoformat())
-            trainrecord['departureTime'] = str((db_trainrecord['departureTime']).isoformat())
+            trainrecord['arrivalTime'] = str(
+                (db_trainrecord['arrivalTime']).isoformat())
+            trainrecord['departureTime'] = str(
+                (db_trainrecord['departureTime']).isoformat())
             trainrecord['propositions'] = []
             for db_propositions in db_trainrecord.propositions:
-                content={}
+                content = {}
                 for db_proposition in db_propositions.content:
-                    content[db_proposition.type] = {'amount': db_proposition.amount, 'seats': db_proposition.remainingSeat}
-                trainrecord['propositions'].append({'recordedTime': db_propositions.recordedTime.isoformat(), 'content':content})
+                    content[db_proposition.type] = {
+                        'amount': db_proposition.amount, 'seats': db_proposition.remainingSeat}
+                trainrecord['propositions'].append(
+                    {'recordedTime': db_propositions.recordedTime.isoformat(), 'content': content})
             trainrecord['origin'] = db_trainrecord['origin'].name
             return trainrecord, 200
         else:
@@ -492,4 +516,3 @@ api.add_resource(TrainRecord, '/trainrecords/<string:trainrecord_id>')
 
 if __name__ == '__main__':
     app.run(port='8080', debug=True)
-
