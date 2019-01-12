@@ -30,4 +30,3 @@ class TrainRecord(Document):
     departureTime = DateTimeField()
     arrivalTime = DateTimeField()
     recordedTime = DateTimeField()
-

@@ -2,14 +2,14 @@ from utils.date import DateTime
 import requests
 from database.Station import Station
 from database.TrainRecord import TrainRecord
-from database.Proposition import Proposition
+from database.Proposition import Proposition, Propositions
 
 
 class Travel:
 
     url = 'https://www.oui.sncf/proposition/rest/search-travels/outward'
 
-    def __init__(self, departure_date: DateTime, arrival_date: DateTime,origin_code: str, destination_code: str,
+    def __init__(self, departure_date: DateTime, arrival_date: DateTime, origin_code: str, destination_code: str,
                  duration: int, propositions: list):
         self.departure_date = departure_date
         self.arrival_date = arrival_date
@@ -27,15 +27,34 @@ class Travel:
                             remainingSeat=proposition['remaining_seat'])
             p.save()
             list_of_proposition.append(p)
+        propositions = Propositions(
+            recordedTime=self.recorded_date, content=list_of_proposition)
+        propositions.save()
 
-        tr = TrainRecord(departureTime=self.departure_date,
-                         arrivalTime=self.arrival_date,
-                         origin=Station.get_station_by_code(self.origin_code),
-                         destination=Station.get_station_by_code(self.destination_code),
-                         duration=self.duration,
-                         recordedTime=self.recorded_date,
-                         propositions=list_of_proposition)
-        tr.save()
+        # tr = TrainRecord(departureTime=self.departure_date,
+        #                 arrivalTime=self.arrival_date,
+        #                 origin=Station.get_station_by_code(self.origin_code),
+        #                 destination=Station.get_station_by_code(self.destination_code),
+        #                 duration=self.duration,
+        #                 recordedTime=self.recorded_date,)
+        # tr.save()
+        tr = TrainRecord.objects(departureTime=self.departure_date,
+                                 arrivalTime=self.arrival_date,
+                                 origin=Station.get_station_by_code(
+                                     self.origin_code),
+                                 destination=Station.get_station_by_code(self.destination_code))
+        if not tr:
+            tr = TrainRecord(departureTime=self.departure_date,
+                             arrivalTime=self.arrival_date,
+                             origin=Station.get_station_by_code(
+                                 self.origin_code),
+                             destination=Station.get_station_by_code(
+                                 self.destination_code),
+                             duration=self.duration,
+                             propositions=[propositions])
+            tr.save()
+        else:
+            tr.update_one(push__propositions=propositions)
         return tr
 
     @staticmethod
@@ -43,21 +62,24 @@ class Travel:
         current_date = DateTime(date.year, date.month, date.day, 2, 0)
         dic_of_travels = {}
         while True:
-            response = Travel.search(current_date, origin_code, destination_code)
+            response = Travel.search(
+                current_date, origin_code, destination_code)
             for resp in response:
                 if not resp['id'] in dic_of_travels:
                     dic_of_travels[resp['id']] = resp
-            
+
             if current_date.to_tdate() == response[-1]['departureDate']:
                 break
-            current_date = DateTime.tdate_to_datetime(response[-1]['departureDate'])
+            current_date = DateTime.tdate_to_datetime(
+                response[-1]['departureDate'])
         return [Travel._dic_to_travel(v, origin_code, destination_code) for k, v in dic_of_travels.items()]
 
     @staticmethod
     def _dic_to_travel(dic, origin_code, destination_code):
         propositions = []
         for proposition in dic['priceProposals']:
-            propositions.append({'type': proposition['type'], 'amount': proposition['amount'], 'remaining_seat': proposition['remainingSeat']})
+            propositions.append(
+                {'type': proposition['type'], 'amount': proposition['amount'], 'remaining_seat': proposition['remainingSeat']})
         t = Travel(departure_date=DateTime.tdate_to_datetime(dic['departureDate']),
                    arrival_date=DateTime.tdate_to_datetime(dic['arrivalDate']),
                    origin_code=dic['originStationCode'],
