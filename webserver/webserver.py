@@ -427,6 +427,7 @@ class TrainRecords(Resource):
     def get():
         """
         Get the list of all the train records registered in the database.
+        :param: page: The page you want to get at, 0 to get all pages. Each page contains 3 train records. - Default is 1
         :return: A list of JSON each containing a train record.
         """
         start = time.time()
@@ -434,15 +435,15 @@ class TrainRecords(Resource):
         # trainrecords parser
         records_parser = reqparse.RequestParser()
         records_parser.add_argument(
-            name='page', type=int, default=1, help="The page you want to get, 0 to get all records")
+            name='page', type=int, default=1, help="The page you want to get at, 0 to get all train records. Each page contains 3 train records.")
         records_args = records_parser.parse_args()
         
         pages = records_args['page']
         offset = 3
         if not(pages):
-            db_trainrecords = dbTrainRecord.objects.order_by('origin')
+            db_trainrecords = dbTrainRecord.objects.order_by('departureTime')
         else:
-            db_trainrecords = dbTrainRecord.objects.order_by('origin')[(pages-1)*offset:pages*offset]
+            db_trainrecords = dbTrainRecord.objects.order_by('departureTime')[(pages-1)*offset:pages*offset]
         trainrecords = json.loads(db_trainrecords.to_json())
         for k in range(len(trainrecords)):
             #step1 = time.time()

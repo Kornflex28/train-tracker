@@ -39,7 +39,7 @@
                     </div>
                 </nav>
                 <div class="col-md ml-sm-auto" role="main">
-                    <h2>Train Records ({{trainrecords.length}}) <i v-show="loading" class="fa fa-circle-o-notch fa-spin"></i></h2>
+                    <h2>Train Records ({{trainrecords.length}})   <i v-show="loading" class="fa fa-spinner fa-spin"></i></h2>
                     <ul>
                         <li v-for="trainrecord in trainrecords">
                             De <strong>{{ trainrecord.origin }}</strong> à <strong>{{ trainrecord.destination }}</strong>
