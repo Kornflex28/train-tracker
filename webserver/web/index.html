@@ -4,6 +4,7 @@
     <meta author="Louis Chauvet" content="">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
         crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link href="./style/main.css" rel="stylesheet">
 
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -38,10 +39,7 @@
                     </div>
                 </nav>
                 <div class="col-md ml-sm-auto" role="main">
-                    <div class="alert alert-info" v-show="loading">
-                        Loading...
-                    </div>
-                    <h2>Train Records ({{trainrecords.length}})</h2>
+                    <h2>Train Records ({{trainrecords.length}}) <i v-show="loading" class="fa fa-circle-o-notch fa-spin"></i></h2>
                     <ul>
                         <li v-for="trainrecord in trainrecords">
                             De <strong>{{ trainrecord.origin }}</strong> à <strong>{{ trainrecord.destination }}</strong>
@@ -61,6 +59,7 @@
                 </div>
             </div>
         </div>
+        <br>
     </div>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         crossorigin="anonymous"></script>
@@ -75,7 +74,7 @@
 
 <footer class="page-footer">
     <div class="footer-copyright text-center">
-        <i>© 2018 - Made by Louis Chauvet and Teddy Turquet</i>
+        <i>© 2019 - Made by Louis Chauvet and Teddy Turquet</i>
     </div>
 </footer>
 

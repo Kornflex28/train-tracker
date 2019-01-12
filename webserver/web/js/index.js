@@ -11,7 +11,7 @@ const trainrecords = new Vue({
     methods: {
         formData: function () {
             this.loading = true;
-            fetch("http://localhost:8080/trainrecords")
+            fetch("http://localhost:8080/trainrecords?page=0")
                 .then(response => response.json())
                 .then((trainrecords) => {
                     for (i = 0; i < trainrecords.length; i++) {

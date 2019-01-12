@@ -5,18 +5,33 @@ const trainrecords = new Vue({
         chartsName: [],
         trainrecords: [],
         loading: false,
+        page: 0,
         display: { 'prices': true, 'seats': true },
     },
     mounted: function () {
-        this.formData();
+        this.formData(state = 'next');
     },
 
     methods: {
-        formData: function () {
+        formData: function (state) {
             this.loading = true;
-            fetch("http://localhost:8080/trainrecords")
+
+            var url = "http://localhost:8080/trainrecords?page=";
+            if (state == 'next') {
+                url += (this.page + 1);
+            }
+            else if (state == 'prev') {
+                url += (this.page - 1);
+            }
+            else {
+                url += 0;
+            }
+
+            fetch(url)
                 .then(response => response.json())
                 .then((trainrecords) => {
+                    this.charts = [];
+                    this.chartsName = [];
                     for (i = 0; i < trainrecords.length; i++) {
                         trainrecords[i]['departureTime'] = new Date(trainrecords[i]['departureTime']).toLocaleString();
                         trainrecords[i]['arrivalTime'] = new Date(trainrecords[i]['arrivalTime']).toLocaleString();
@@ -24,6 +39,7 @@ const trainrecords = new Vue({
                         this.chartsName.push(trainrecords[i]['name']);
                     }
                     this.trainrecords = trainrecords;
+
 
                     // var trains = {};
                     // for (i = 0; i < trainrecords.length; i++) {
@@ -183,10 +199,24 @@ const trainrecords = new Vue({
                         }));
                     }
                 })
-                .finally(() => (this.loading = false));
+                .finally(() => {
+                    this.loading = false;
+                    if (state == 'next') {
+                        this.page += 1;
+                    }
+                    else if (state == 'prev') {
+                        this.page -= 1;;
+                    }
+                    else {
+                        this.page = 0;
+                    }
+                });
         },
 
         search: function () {
+            if (this.page != 0) {
+                this.formData('all');
+            }
             var input = document.getElementById('searchbar');
             var filter = input.value.toUpperCase();
             var graphs = document.getElementsByTagName('canvas');

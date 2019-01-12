@@ -430,8 +430,19 @@ class TrainRecords(Resource):
         :return: A list of JSON each containing a train record.
         """
         start = time.time()
-        db_trainrecords = dbTrainRecord.objects.order_by(
-            "origin", "departureTime", "destination")
+
+        # trainrecords parser
+        records_parser = reqparse.RequestParser()
+        records_parser.add_argument(
+            name='page', type=int, default=1, help="The page you want to get, 0 to get all records")
+        records_args = records_parser.parse_args()
+        
+        pages = records_args['page']
+        offset = 3
+        if not(pages):
+            db_trainrecords = dbTrainRecord.objects.order_by('origin')
+        else:
+            db_trainrecords = dbTrainRecord.objects.order_by('origin')[(pages-1)*offset:pages*offset]
         trainrecords = json.loads(db_trainrecords.to_json())
         for k in range(len(trainrecords)):
             #step1 = time.time()
