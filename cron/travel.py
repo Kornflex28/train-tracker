@@ -65,7 +65,8 @@ class Travel:
             response = Travel.search(
                 current_date, origin_code, destination_code)
             for resp in response:
-                if not resp['id'] in dic_of_travels:
+                ids = ' '.join(dic_of_travels.keys())
+                if not ((resp['id'][:21] in ids) and (resp['id'][-22:] in ids)):
                     dic_of_travels[resp['id']] = resp
 
             if current_date.to_tdate() == response[-1]['departureDate']:
