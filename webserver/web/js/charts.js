@@ -16,7 +16,7 @@ const trainrecords = new Vue({
         formData: function (state) {
             this.loading = true;
 
-            var url = "http://localhost:8080/trainrecords/pages/";
+            var url = "http://localhost:8080/trainrecords?page=";
             if (state == 'next') {
                 url += (this.page + 1);
             }
