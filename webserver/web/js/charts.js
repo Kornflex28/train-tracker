@@ -16,7 +16,7 @@ const trainrecords = new Vue({
         formData: function (state) {
             this.loading = true;
 
-            var url = "http://localhost:8080/trainrecords?page=";
+            var url = "http://localhost:8080/trainrecords/pages/";
             if (state == 'next') {
                 url += (this.page + 1);
             }
@@ -26,7 +26,7 @@ const trainrecords = new Vue({
             else {
                 url += 0;
             }
-
+            
             fetch(url)
                 .then(response => response.json())
                 .then((trainrecords) => {
