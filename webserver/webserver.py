@@ -214,8 +214,18 @@ class Stations(Resource):
         Get the list of all the stations registered in the database.
         :return: A list of JSON each containing a station.
         """
+
+        # stations parser
+        stations_parser = reqparse.RequestParser()
+        stations_parser.add_argument(
+            name='name', type=str, help="The name of the station")
+        stations_args = stations_parser.parse_args()
+
         start = time.time()
-        stations = json.loads(dbStation.objects.to_json())
+        if stations_args['name'] is not None:
+            stations = json.loads(dbStation.search_station(stations_args['name']).to_json())
+        else:
+            stations = json.loads(dbStation.objects.to_json())
         end = time.time()
         print("GET /stations took "+str(end-start)+" s")
         return stations, 200
