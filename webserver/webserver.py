@@ -214,8 +214,18 @@ class Stations(Resource):
         Get the list of all the stations registered in the database.
         :return: A list of JSON each containing a station.
         """
+
+        # stations parser
+        stations_parser = reqparse.RequestParser()
+        stations_parser.add_argument(
+            name='name', type=str, help="The name of the station")
+        stations_args = stations_parser.parse_args()
+
         start = time.time()
-        stations = json.loads(dbStation.objects.to_json())
+        if stations_args['name'] is not None:
+            stations = json.loads(dbStation.search_station(stations_args['name']).order_by("name").to_json())
+        else:
+            stations = json.loads(dbStation.objects.order_by("name").to_json())
         end = time.time()
         print("GET /stations took "+str(end-start)+" s")
         return stations, 200
@@ -426,25 +436,26 @@ class TrainRecords(Resource):
     @staticmethod
     def get():
         """
-        Get the list of all the train records registered in the database.
+        Get the list of all the train records registered in the database by page.
         :param: page: The page you want to get at, 0 to get all pages. Each page contains 3 train records. - Default is 1
         :return: A list of JSON each containing a train record.
         """
         start = time.time()
-
         # trainrecords parser
-        records_parser = reqparse.RequestParser()
-        records_parser.add_argument(
-            name='page', type=int, default=1, help="The page you want to get at, 0 to get all train records. Each page contains 3 train records.")
-        records_args = records_parser.parse_args()
-        
-        pages = records_args['page']
+        trainrecords_parser = reqparse.RequestParser()
+        trainrecords_parser.add_argument(
+            name='page', type=int, default=1, help="The page you want to get at, 0 to get all pages. Each page contains 3 train records. - Default is 1")
+        trainrecords_args = trainrecords_parser.parse_args()
+
+        page_id = trainrecords_args['page']
         offset = 3
-        if not(pages):
+        
+        if not(page_id):
             db_trainrecords = dbTrainRecord.objects.order_by('departureTime')
         else:
-            db_trainrecords = dbTrainRecord.objects.order_by('departureTime')[(pages-1)*offset:pages*offset]
+            db_trainrecords = dbTrainRecord.objects.order_by('departureTime')[(page_id-1)*offset:page_id*offset]
         trainrecords = json.loads(db_trainrecords.to_json())
+
         for k in range(len(trainrecords)):
             #step1 = time.time()
             #trainrecords[k]['recordedTime'] = str((db_trainrecords[k]['recordedTime']).isoformat())
@@ -478,6 +489,56 @@ class TrainRecords(Resource):
 
 
 api.add_resource(TrainRecords, '/trainrecords')
+
+# class TrainRecordsPages(Resource):
+#     @staticmethod
+#     def get(page_id):
+#         """
+#         Get the list of all the train records registered in the database by page.
+#         :param: page_id: The page you want to get at, 0 to get all pages. Each page contains 3 train records. - Default is 1
+#         :return: A list of JSON each containing a train record.
+#         """
+#         start = time.time()
+#         page_id=int(page_id)
+#         offset = 3
+#         if not(page_id):
+#             db_trainrecords = dbTrainRecord.objects.order_by('departureTime')
+#         else:
+#             db_trainrecords = dbTrainRecord.objects.order_by('departureTime')[(page_id-1)*offset:page_id*offset]
+#         trainrecords = json.loads(db_trainrecords.to_json())
+#         for k in range(len(trainrecords)):
+#             #step1 = time.time()
+#             #trainrecords[k]['recordedTime'] = str((db_trainrecords[k]['recordedTime']).isoformat())
+#             #step2 = time.time()
+#             #print("step 1 took {} s".format(step2-step1))
+#             trainrecords[k]['arrivalTime'] = str(
+#                 (db_trainrecords[k].arrivalTime.isoformat()))
+#             #step3 = time.time()
+#             #print("step 2 took {} s".format(step3-step2))
+#             trainrecords[k]['departureTime'] = str(
+#                 (db_trainrecords[k].departureTime.isoformat()))
+#             #step4 = time.time()
+#             #print("step 3 took {} s".format(step4-step3))
+#             trainrecords[k]['propositions'] = []
+#             for db_propositions in db_trainrecords[k].propositions:
+#                 content = {}
+#                 for db_proposition in db_propositions.content:
+#                     content[db_proposition.type] = {
+#                         'amount': db_proposition.amount, 'seats': db_proposition.remainingSeat}
+#                 trainrecords[k]['propositions'].append(
+#                     {'recordedTime': db_propositions.recordedTime.isoformat(), 'content': content})
+#             #step5 = time.time()
+#             #print("step 4 took {} s".format(step5-step4))
+#             trainrecords[k]['destination'] = db_trainrecords[k].destination.name
+#             trainrecords[k]['origin'] = db_trainrecords[k].origin.name
+#             #print("One trainrecord took {} s".format(step5-step1))
+
+#         end = time.time()
+#         print("GET /trainrecords/pages/"+str(page_id)+" took "+str(end-start)+" s")
+#         return trainrecords, 200
+
+
+# api.add_resource(TrainRecordsPages, '/trainrecords/pages/<string:page_id>')
 
 
 # TrainRecord

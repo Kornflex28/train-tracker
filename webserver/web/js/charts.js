@@ -26,7 +26,7 @@ const trainrecords = new Vue({
             else {
                 url += 0;
             }
-
+            
             fetch(url)
                 .then(response => response.json())
                 .then((trainrecords) => {
