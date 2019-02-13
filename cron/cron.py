@@ -29,8 +29,8 @@ for k,request in enumerate(req):
                     for i in range(request.gapTime)]
         else :
             delta = request.date.now() - request.date
-            dates = [request.date.now() + dt.timedelta(days=delta.days)
-                    for i in range(request.gapTime)]
+            dates = [request.date.now() + dt.timedelta(days=i)
+                    for i in range(request.gapTime-delta.days)]
         n_dates = len(dates)
         for i,date in enumerate(dates):
             travels = Travel.get_all_travels(
