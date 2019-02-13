@@ -13,14 +13,16 @@ from database.Request import Request as dbRequest
 
 req = dbRequest.objects()
 n_req = len(req)
+sys.stdout.write('\rRequest {}/{} [{}] {}% '.format(0,n_req,' '*100, 0))
 for k,request in enumerate(req):
-    print("Request {}/{}".format(k+1,n_req))
     if request.uniqueDate:
         travels = Travel.get_all_travels(
             request.date, request.origin.code, request.destination.code)
-        for travel in travels:
-            # travel.save_to_database()
-            a=1
+        n_travels = len (travels)
+        for j,travel in enumerate(travels):
+            travel.save_to_database()
+            perc = 100*(k/n_req+(j+1)/(n_travels*n_req))
+            sys.stdout.write('\rRequest {0}/{1} [{2}{3}] {4:.2f}% '.format(k+1,n_req,'#'*int(round(perc,0)), ' '*int(round(100-perc,0)), perc))
     else:
         if dt.datetime.now() < request.date  :
             dates = [request.date + dt.timedelta(days=i)
@@ -30,11 +32,11 @@ for k,request in enumerate(req):
             dates = [request.date.now() + dt.timedelta(days=delta.days)
                     for i in range(request.gapTime)]
         n_dates = len(dates)
-        sys.stdout.write('\r[{}] {}% '.format(' '*100, 0))
         for i,date in enumerate(dates):
             travels = Travel.get_all_travels(
                 date, request.origin.code, request.destination.code)
-            for travel in travels:
-                # travel.save_to_database()
-                a=1
-            sys.stdout.write('\r[{}{}] {}% '.format('#'*int(100*(i+1)/n_dates), ' '*int(100*(1-(i+1)/n_dates)), int(100*(i+1)/n_dates)))
+            n_travels=len(travels)
+            for j,travel in enumerate(travels):
+                travel.save_to_database()
+                perc = 100*(k/n_req+i/(n_dates*n_req)+(j+1)/(n_dates*n_travels*n_req))
+                sys.stdout.write('\rRequest {0}/{1} [{2}{3}] {4:.2f}% '.format(k+1,n_req,'#'*int(round(perc,0)), ' '*int(round(100-perc,0)), perc))
